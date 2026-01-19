@@ -46,7 +46,7 @@ namespace LibraryManager.Domain.ValueObjects
                 return new Isbn(value);
             }
             else {
-                throw new ArgumentException("InvalidBookException: ISBN not valid");
+                throw new DomainValidationException("ISBN not valid");
             }
         }
 
