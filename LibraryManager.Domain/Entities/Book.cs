@@ -1,4 +1,5 @@
 ﻿using LibraryManager.Domain.Exceptions;
+using LibraryManager.Domain.Results;
 using LibraryManager.Domain.ValueObjects;
 
 namespace LibraryManager.Domain.Entities
@@ -24,29 +25,40 @@ namespace LibraryManager.Domain.Entities
             Isbn = Isbn.Parse(isbn); //защита уже есть внутри VO.
         }
 
-        public void ChangeTitle(string newTitle)
+        public OperationResult<Book> ChangeTitle(string newTitle)
         {
-            if (string.IsNullOrEmpty(newTitle))
-                throw new DomainValidationException("Book title can't be empty");
+            if (string.IsNullOrEmpty(newTitle)) {
+                return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Book title cannot be empty");
+            }
             Title = newTitle;
+            return OperationResult<Book>.Ok(this);
         }
 
-        public void ChangeDescription(string? newDescription)
+        public OperationResult<Book> ChangeDescription(string? newDescription)
         {
             if (string.IsNullOrWhiteSpace(newDescription))
-                return; //silent change
+                return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Book description is empty");
             
             Description = newDescription;
+            return OperationResult<Book>.Ok(this);
         }
 
-        public void ChangeIsbn(string newIsbn)
+        public OperationResult<Book> ChangeIsbn(string newIsbn)
         {
-            Isbn = Isbn.Parse(newIsbn);
+            if (!Isbn.IsValid(newIsbn))
+                return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, "ISBN is invalid");
+
+            Isbn = Isbn.Parse(newIsbn); // теперь безопасно, т.к. IsValid проверили
+            return OperationResult<Book>.Ok(this);
         }
 
-        public void ChangeAuthor(Author newAuthor)
+        public OperationResult<Book> ChangeAuthor(Author newAuthor)
         {
-            Author = newAuthor ?? throw new DomainValidationException("Author cannot be null");
+            if(newAuthor == null) {
+                return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Author is empty");
+            }
+            Author = newAuthor;
+            return OperationResult<Book>.Ok(this);
         }
     }
 }

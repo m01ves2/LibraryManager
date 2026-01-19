@@ -1,4 +1,5 @@
 ﻿using LibraryManager.Domain.Exceptions;
+using LibraryManager.Domain.Results;
 
 namespace LibraryManager.Domain.Entities
 {
@@ -14,11 +15,13 @@ namespace LibraryManager.Domain.Entities
             Name = name;
         }
 
-        public void ChangeName(string newName)
+        public OperationResult<Author> ChangeName(string newName)
         {
-            if (string.IsNullOrWhiteSpace(newName))
-                throw new DomainValidationException("Author name cannot be empty");
+            if (string.IsNullOrWhiteSpace(newName)) {
+                return OperationResult<Author>.Fail(ResultStatus.AuthorMissing, "Author name cannot be empty");
+            }
             Name = newName;
+            return OperationResult<Author>.Ok(this);
         }
     }
 }
