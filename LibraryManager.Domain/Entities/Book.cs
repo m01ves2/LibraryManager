@@ -25,7 +25,24 @@ namespace LibraryManager.Domain.Entities
             Isbn = Isbn.Parse(isbn); //защита уже есть внутри VO.
         }
 
-        public OperationResult<Book> ChangeTitle(string newTitle)
+        public OperationResult<Book> UpdateBook(Book other)
+        {
+            // Используем уже существующие методы ChangeX
+            var titleResult = UpdateTitle(other.Title);
+            var descResult = UpdateDescription(other.Description);
+            var isbnResult = UpdateIsbn(other.Isbn.Value);
+            var authorResult = UpdateAuthor(other.Author);
+
+            // Проверяем результаты
+            if (!titleResult.IsSuccess) return titleResult;
+            if (!descResult.IsSuccess) return descResult;
+            if (!isbnResult.IsSuccess) return isbnResult;
+            if (!authorResult.IsSuccess) return authorResult;
+
+            return OperationResult<Book>.Ok(this);
+        }
+
+        public OperationResult<Book> UpdateTitle(string newTitle)
         {
             if (string.IsNullOrEmpty(newTitle)) {
                 return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Book title cannot be empty");
@@ -34,7 +51,7 @@ namespace LibraryManager.Domain.Entities
             return OperationResult<Book>.Ok(this);
         }
 
-        public OperationResult<Book> ChangeDescription(string? newDescription)
+        public OperationResult<Book> UpdateDescription(string? newDescription)
         {
             if (string.IsNullOrWhiteSpace(newDescription))
                 return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Book description is empty");
@@ -43,7 +60,7 @@ namespace LibraryManager.Domain.Entities
             return OperationResult<Book>.Ok(this);
         }
 
-        public OperationResult<Book> ChangeIsbn(string newIsbn)
+        public OperationResult<Book> UpdateIsbn(string newIsbn)
         {
             if (!Isbn.IsValid(newIsbn))
                 return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, "ISBN is invalid");
@@ -52,7 +69,7 @@ namespace LibraryManager.Domain.Entities
             return OperationResult<Book>.Ok(this);
         }
 
-        public OperationResult<Book> ChangeAuthor(Author newAuthor)
+        public OperationResult<Book> UpdateAuthor(Author newAuthor)
         {
             if(newAuthor == null) {
                 return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Author is empty");

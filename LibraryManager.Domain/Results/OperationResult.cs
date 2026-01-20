@@ -8,12 +8,13 @@
         InvalidIsbn,
         AuthorMissing,
         BookMissing,
+        NotFound,
         Error
     }
 
     public class OperationResult<T>
     {
-        public bool Success => Status == ResultStatus.Success;
+        public bool IsSuccess => Status == ResultStatus.Success;
         public ResultStatus Status { get; }
         public string Message { get; }
         public T? Data { get; }

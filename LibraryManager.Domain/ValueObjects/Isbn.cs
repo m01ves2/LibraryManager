@@ -27,7 +27,7 @@ namespace LibraryManager.Domain.ValueObjects
         {
             if (ReferenceEquals(left, null))
                 return ReferenceEquals(right, null);
-            return ReferenceEquals(left, right) || left.Equals(right);
+            return left.Equals(right);
         }
 
         public static bool operator!=(Isbn left, Isbn right)

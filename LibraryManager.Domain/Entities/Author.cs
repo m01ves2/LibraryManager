@@ -23,5 +23,32 @@ namespace LibraryManager.Domain.Entities
             Name = newName;
             return OperationResult<Author>.Ok(this);
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(this, obj)) 
+                return true;
+            if (obj is not Author other) 
+                return false;
+
+            return Id == other.Id && Name == other.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name);
+        }
+
+        public static bool operator ==(Author left, Author right)
+        {
+            if (ReferenceEquals(left, null))
+                return ReferenceEquals(right, null);
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Author left, Author right)
+        {
+            return !(left == right);
+        }
     }
 }
