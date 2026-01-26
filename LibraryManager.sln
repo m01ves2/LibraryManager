@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManager", "LibraryManager\LibraryManager.csproj", "{333DCB52-6117-41CD-88A5-822FAE24CB6F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManager.Domain", "LibraryManager.Domain\LibraryManager.Domain.csproj", "{7247BC79-1FFE-483D-A56A-4987E2FD352E}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{333DCB52-6117-41CD-88A5-822FAE24CB6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{333DCB52-6117-41CD-88A5-822FAE24CB6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{333DCB52-6117-41CD-88A5-822FAE24CB6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{333DCB52-6117-41CD-88A5-822FAE24CB6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7247BC79-1FFE-483D-A56A-4987E2FD352E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7247BC79-1FFE-483D-A56A-4987E2FD352E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7247BC79-1FFE-483D-A56A-4987E2FD352E}.Release|Any CPU.ActiveCfg = Release|Any CPU
