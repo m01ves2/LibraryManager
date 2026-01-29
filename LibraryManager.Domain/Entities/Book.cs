@@ -71,7 +71,7 @@ namespace LibraryManager.Domain.Entities
 
         public OperationResult<Book> UpdateAuthor(Author newAuthor)
         {
-            if(newAuthor == null) {
+            if(newAuthor is null) {
                 return OperationResult<Book>.Fail(ResultStatus.BookMissing, "Author is empty");
             }
             Author = newAuthor;
