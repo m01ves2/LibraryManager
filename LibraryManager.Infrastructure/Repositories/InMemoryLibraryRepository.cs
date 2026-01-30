@@ -32,7 +32,7 @@ namespace LibraryManager.Infrastructure.Repositories
             if(isSuccess)
                 return OperationResult<Book>.Ok(book);
             else
-               return OperationResult<Book>.Fail(ResultStatus.NotFound, $"Book to delete not found"); 
+               return OperationResult<Book>.Fail(ResultStatus.NotFound, $"Book to delete not found");
         }
 
 

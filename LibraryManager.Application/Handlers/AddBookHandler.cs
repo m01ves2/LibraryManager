@@ -13,10 +13,10 @@ namespace LibraryManager.Application.Handlers
         private readonly ILibraryRepository _repository;
         private readonly AddBookUseCase _useCase;
 
-        public AddBookHandler(ILibraryRepository repository, AddBookUseCase useCase)
+        public AddBookHandler(ILibraryRepository repository)
         {
             _repository = repository;
-            _useCase = useCase;
+            _useCase = new AddBookUseCase(_repository);
         }
 
         public OperationResult<Book> Handle(AddBookRequest dto)

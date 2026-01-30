@@ -5,11 +5,13 @@
         Success,
         Fail,
         Duplicate,
+        Ambiguous,
         InvalidIsbn,
         AuthorMissing,
         BookMissing,
         NotFound,
-        Error
+        InvalidRequest,
+        Error,
     }
 
     public class OperationResult<T>
