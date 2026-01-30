@@ -17,11 +17,20 @@
         public bool IsSuccess => Status == ResultStatus.Success;
         public ResultStatus Status { get; }
         public string Message { get; }
-        public T? Data { get; }
+        public T Data { get; }
 
-        public static OperationResult<T> Ok(T data) => new OperationResult<T>(ResultStatus.Success, "Ok", data);
-        public static OperationResult<T> Fail(ResultStatus status = ResultStatus.Fail, string message = "Fail") => new OperationResult<T>(status, message, default);
-        private OperationResult(ResultStatus status, string message, T? data)
+        public static OperationResult<T> Ok(T data)
+        {
+            if (data is null)
+                throw new ArgumentNullException(nameof(data));
+
+            return new OperationResult<T>(ResultStatus.Success, "Ok", data);
+        }
+        public static OperationResult<T> Fail(ResultStatus status = ResultStatus.Fail, string message = "Fail")
+        {
+            return new OperationResult<T>(status, message, default!);
+        }
+        private OperationResult(ResultStatus status, string message, T data)
         {
             Status = status;
             Message = message;

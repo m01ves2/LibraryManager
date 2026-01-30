@@ -12,7 +12,7 @@ namespace LibraryManager.Domain.Entities
         public string? Description { get; private set; } //необязательное поле, можно менять
         public Isbn  Isbn { get; private set; }
         
-        public Book(string title, string description, Author author, string isbn)
+        public Book(string title, string description, Author author, Isbn isbn)
         {
             Title = title;      
             if (string.IsNullOrWhiteSpace(title))
@@ -22,7 +22,7 @@ namespace LibraryManager.Domain.Entities
 
             Author = author ?? throw new DomainValidationException("Author cannot be null");
 
-            Isbn = Isbn.Parse(isbn); //защита уже есть внутри VO.
+            Isbn = isbn;
         }
 
         public OperationResult<Book> UpdateBook(Book other)
@@ -30,7 +30,7 @@ namespace LibraryManager.Domain.Entities
             // Используем уже существующие методы ChangeX
             var titleResult = UpdateTitle(other.Title);
             var descResult = UpdateDescription(other.Description);
-            var isbnResult = UpdateIsbn(other.Isbn.Value);
+            var isbnResult = UpdateIsbn(other.Isbn);
             var authorResult = UpdateAuthor(other.Author);
 
             // Проверяем результаты
@@ -60,12 +60,16 @@ namespace LibraryManager.Domain.Entities
             return OperationResult<Book>.Ok(this);
         }
 
-        public OperationResult<Book> UpdateIsbn(string newIsbn)
+        public OperationResult<Book> UpdateIsbn(Isbn newIsbn)
         {
-            if (!Isbn.IsValid(newIsbn))
+            //if (!Isbn.IsValid(newIsbn))
+            //    return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, "ISBN is invalid");
+            //Isbn = Isbn.Parse(newIsbn); // теперь безопасно, т.к. IsValid проверили
+            
+            if(newIsbn is null) {
                 return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, "ISBN is invalid");
-
-            Isbn = Isbn.Parse(newIsbn); // теперь безопасно, т.к. IsValid проверили
+            }
+            Isbn = newIsbn;
             return OperationResult<Book>.Ok(this);
         }
 

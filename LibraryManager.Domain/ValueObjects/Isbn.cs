@@ -1,4 +1,5 @@
 ﻿using LibraryManager.Domain.Exceptions;
+using LibraryManager.Domain.Results;
 using System.Text.RegularExpressions;
 
 namespace LibraryManager.Domain.ValueObjects
@@ -42,17 +43,25 @@ namespace LibraryManager.Domain.ValueObjects
 
         public static Isbn Parse(string value)
         {
-            if (IsValid(value)) {
-                return new Isbn(value);
-            }
-            else {
-                throw new DomainValidationException("ISBN not valid");
-            }
+            var result = TryParse(value);
+
+            if (!result.IsSuccess)
+                throw new DomainValidationException(result.Message);
+
+            return result.Data;
+        }
+
+        public static OperationResult<Isbn> TryParse(string value)
+        {
+            if (!IsValid(value))
+                return OperationResult<Isbn>.Fail( ResultStatus.InvalidIsbn, "Invalid ISBN format");
+
+            return OperationResult<Isbn>.Ok(new Isbn(value));
         }
 
         public static bool IsValid(string value)
         {
-            if(string.IsNullOrEmpty(value))
+            if(string.IsNullOrWhiteSpace(value))
                 return false;
 
             string normalized = value.Replace("-", "");
