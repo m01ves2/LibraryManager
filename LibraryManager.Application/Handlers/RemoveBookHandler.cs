@@ -1,5 +1,7 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Mappers;
+using LibraryManager.Application.Requests;
 using LibraryManager.Application.UseCases;
+using LibraryManager.Application.ViewModels;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.Results;
@@ -18,13 +20,18 @@ namespace LibraryManager.Application.Handlers
             _useCase = new RemoveBookUseCase(_repository);
         }
 
-        public OperationResult<Book> Handle(RemoveBookRequest dto)
+        public ViewResult<ViewBook> Handle(RemoveBookRequest dto)
         {
             var isbnResult = ResolveIsbn(dto);
             if (!isbnResult.IsSuccess)
-                return OperationResult<Book>.Fail(isbnResult.Status, isbnResult.Message);
+                return new ViewResult<ViewBook>()
+                {
+                    Status = ResultStatusMapper.ToViewStatus(isbnResult.Status),
+                    Message = isbnResult.Message
+                };
 
-            return _useCase.Execute(isbnResult.Data);
+            ViewResult<ViewBook> viewResult =  ResultMapper.ToViewResult(_useCase.Execute(isbnResult.Data), BookMapper.ToViewBook);
+            return viewResult;
         }
 
         private OperationResult<Isbn> ResolveIsbn(RemoveBookRequest dto)

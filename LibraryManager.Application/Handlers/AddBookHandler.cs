@@ -1,7 +1,8 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Mappers;
+using LibraryManager.Application.Requests;
 using LibraryManager.Application.UseCases;
+using LibraryManager.Application.ViewModels;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Exceptions;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.Results;
 using LibraryManager.Domain.ValueObjects;
@@ -19,21 +20,26 @@ namespace LibraryManager.Application.Handlers
             _useCase = new AddBookUseCase(_repository);
         }
 
-        public OperationResult<Book> Handle(AddBookRequest dto)
+        public ViewResult<ViewBook> Handle(AddBookRequest dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Title)) {
-                return OperationResult<Book>.Fail(ResultStatus.BookMissing, $"Book title is incorrect");
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.BookMissing, Message = $"Book title is incorrect" };
             }
 
             OperationResult<Isbn> isbnResult = Isbn.TryParse(dto.Isbn);
             if (!isbnResult.IsSuccess)
-                return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, isbnResult.Message);
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.InvalidIsbn, Message = isbnResult.Message };
 
             OperationResult<Author> authorResult = _repository.FindAuthor(a => a.Id == dto.AuthorId);
             if (!authorResult.IsSuccess)
-                return OperationResult<Book>.Fail(ResultStatus.NotFound, authorResult.Message);
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.NotFound, Message = authorResult.Message };
 
-            return _useCase.Execute(dto.Title, dto.Description, authorResult.Data, isbnResult.Data);
+            OperationResult<Book> result = _useCase.Execute(dto.Title, dto.Description, authorResult.Data, isbnResult.Data);
+            
+            //ViewResult<ViewBook> viewResult = ResultMapper.ToViewResult<ViewBook, Book>(result, BookMapper.ToViewBook );
+            ViewResult<ViewBook> viewResult = ResultMapper.ToViewResult(result, BookMapper.ToViewBook);
+
+            return viewResult;
         }
     }
 }

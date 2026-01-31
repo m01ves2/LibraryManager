@@ -1,6 +1,6 @@
 ﻿using LibraryManager.Application.Handlers;
 using LibraryManager.Application.Requests;
-using LibraryManager.Application.UseCases;
+using LibraryManager.Application.ViewModels;
 using LibraryManager.Infrastructure.Repositories;
 
 namespace LibraryManager.UI.CLI
@@ -9,9 +9,10 @@ namespace LibraryManager.UI.CLI
     {
         public static void Main(string[] args)
         {
-            var repository = new InMemoryLibraryRepository();
+            var repository = new InMemoryLibraryRepository(); //TODO сделать по уму CR! сейчас у нас транзитивная зависимость от Infrastructure через другие слои!!
             var addHandler = new AddBookHandler(repository);
             var removeHandler = new RemoveBookHandler(repository);
+            var listHandler = new ListBookHandler(repository);
 
             while (true) {
                 Console.Clear();
@@ -21,16 +22,24 @@ namespace LibraryManager.UI.CLI
                     case "add":
                         // собираем данные из консоли и вызываем addHandler.Handle
                         AddBookRequest addBookRequest = AddBookMenu();
-                        addHandler.Handle(addBookRequest);
+                        ViewResult<ViewBook> addResult = addHandler.Handle(addBookRequest);
+                        
+                        DisplayResult<ViewBook>(addResult, b => $"Book ({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value}) added");
                         break;
                     case "remove":
                         // собираем данные (BookId, Title или Isbn) и вызываем removeHandler.Handle
                         RemoveBookRequest removeBookRequest = RemoveBookRequestMenu();
-                        removeHandler.Handle(removeBookRequest);
+                        ViewResult<ViewBook> removeResult = removeHandler.Handle(removeBookRequest);
+                        
+                        DisplayResult<ViewBook>(removeResult, b => $"Book ({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value}) removed");
                         break;
                     case "list":
                         // выводим все книги из репозитория
-                        //TODO
+                        ListBookRequest listBookRequest = ListBookRequestMenu();
+                        ViewResult<List<ViewBook>> listResult = listHandler.Handle(listBookRequest);
+
+                        DisplayResult<List<ViewBook>>(listResult, books => string.Join(Environment.NewLine, books.Select(b => $"({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value})")));
+
                         break;
                     case "exit":
                         return;
@@ -79,5 +88,19 @@ namespace LibraryManager.UI.CLI
             return new RemoveBookRequest { Title = title };
         }
 
+        private static ListBookRequest ListBookRequestMenu()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void DisplayResult<T>(ViewResult<T> result, Func<T, string> formatter)
+        {
+            if (!result.IsSuccess) {
+                Console.WriteLine(result.Message);
+                return;
+            }
+
+            Console.WriteLine(formatter(result.Data));
+        }
     }
 }
