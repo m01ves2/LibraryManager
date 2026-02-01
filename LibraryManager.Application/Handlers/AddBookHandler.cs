@@ -23,18 +23,24 @@ namespace LibraryManager.Application.Handlers
         public ViewResult<ViewBook> Handle(AddBookRequest dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Title)) {
-                return new ViewResult<ViewBook>() { Status = ViewResultStatus.BookMissing, Message = $"Book title is incorrect" };
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.BookMissing, Message = $"Book title is missing" };
             }
 
+            if (string.IsNullOrWhiteSpace(dto.Isbn)) {
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.BookMissing, Message = $"Book ISBN is missing" };
+            }
             OperationResult<Isbn> isbnResult = Isbn.TryParse(dto.Isbn);
-            if (!isbnResult.IsSuccess)
+            if (isbnResult.Status != ResultStatus.Success)
                 return new ViewResult<ViewBook>() { Status = ViewResultStatus.InvalidIsbn, Message = isbnResult.Message };
 
+            if(dto.AuthorId is null) {
+                return new ViewResult<ViewBook>() { Status = ViewResultStatus.BookMissing, Message = $"AuthorId is missing" };
+            }
             OperationResult<Author> authorResult = _repository.FindAuthor(a => a.Id == dto.AuthorId);
-            if (!authorResult.IsSuccess)
+            if (authorResult.Status != ResultStatus.Success)
                 return new ViewResult<ViewBook>() { Status = ViewResultStatus.NotFound, Message = authorResult.Message };
 
-            OperationResult<Book> result = _useCase.Execute(dto.Title, dto.Description, authorResult.Data, isbnResult.Data);
+            OperationResult<Book> result = _useCase.Execute(dto.Title!, dto.Description!, authorResult.Data!, isbnResult.Data!);
             
             //ViewResult<ViewBook> viewResult = ResultMapper.ToViewResult<ViewBook, Book>(result, BookMapper.ToViewBook );
             ViewResult<ViewBook> viewResult = ResultMapper.ToViewResult(result, BookMapper.ToViewBook);

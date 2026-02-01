@@ -16,23 +16,14 @@
 
     public class OperationResult<T>
     {
-        public bool IsSuccess => Status == ResultStatus.Success;
         public ResultStatus Status { get; }
         public string Message { get; }
-        public T Data { get; }
+        public T? Data { get; }
 
-        public static OperationResult<T> Ok(T data)
-        {
-            if (data is null)
-                throw new ArgumentNullException(nameof(data));
-
-            return new OperationResult<T>(ResultStatus.Success, "Ok", data);
-        }
-        public static OperationResult<T> Fail(ResultStatus status = ResultStatus.Fail, string message = "Fail")
-        {
-            return new OperationResult<T>(status, message, default!);
-        }
-        private OperationResult(ResultStatus status, string message, T data)
+        public static OperationResult<T> Ok(T data) => new OperationResult<T>(ResultStatus.Success, "Ok", data);
+        public static OperationResult<T> NotFound(string message) => new OperationResult<T>(ResultStatus.NotFound, message);
+        public static OperationResult<T> Fail(string message) => new OperationResult<T>(ResultStatus.Fail, message);
+        public OperationResult(ResultStatus status, string message, T? data = default)
         {
             Status = status;
             Message = message;

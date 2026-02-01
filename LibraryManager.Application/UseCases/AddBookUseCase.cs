@@ -14,12 +14,12 @@ namespace LibraryManager.Application.UseCases
             _repository = repository;
         }
 
-        public OperationResult<Book> Execute(string title, string description, Author author, Isbn isbn)
+        public OperationResult<Book> Execute(string title, string description, Author author, Isbn isbn) //not null, even required!
         {
             Book book = new Book(title, description, author, isbn);
             OperationResult<Book> result = _repository.FindBook(b => b.Isbn == book.Isbn);
-            if (result.IsSuccess)
-                return OperationResult<Book>.Fail(ResultStatus.Duplicate, $"Book with ISBN{isbn.Value} already exists");
+            if (result.Status == ResultStatus.Success)
+                return new OperationResult<Book>(ResultStatus.Duplicate, $"Book with ISBN{isbn.Value} already exists");
             
             return _repository.AddBook(book);
         }

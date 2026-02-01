@@ -9,6 +9,7 @@ namespace LibraryManager.Application.Mappers
         public static ViewBook ToViewBook(Book book)
             => new ViewBook()
             {
+                Id = book.Id,
                 Title = book.Title,
                 Author = AuthorMapper.ToViewAuthor(book.Author),
                 Description = book.Description,

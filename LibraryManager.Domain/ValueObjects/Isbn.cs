@@ -45,7 +45,7 @@ namespace LibraryManager.Domain.ValueObjects
         {
             var result = TryParse(value);
 
-            if (!result.IsSuccess)
+            if (result.Status != ResultStatus.Success)
                 throw new DomainValidationException(result.Message);
 
             return result.Data;
@@ -54,7 +54,7 @@ namespace LibraryManager.Domain.ValueObjects
         public static OperationResult<Isbn> TryParse(string value)
         {
             if (!IsValid(value))
-                return OperationResult<Isbn>.Fail( ResultStatus.InvalidIsbn, "Invalid ISBN format");
+                return new OperationResult<Isbn>( ResultStatus.InvalidIsbn, "Invalid ISBN format");
 
             return OperationResult<Isbn>.Ok(new Isbn(value));
         }

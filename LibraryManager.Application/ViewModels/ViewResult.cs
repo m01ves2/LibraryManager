@@ -1,4 +1,6 @@
-﻿namespace LibraryManager.Application.ViewModels
+﻿using LibraryManager.Domain.Results;
+
+namespace LibraryManager.Application.ViewModels
 {
     public enum ViewResultStatus
     {
@@ -15,7 +17,6 @@
     }
     public class ViewResult<T>
     {
-        public bool IsSuccess => Status == ViewResultStatus.Success;
         public ViewResultStatus Status { get; set; }
         public string? Message { get; set; }
         public T? Data { get; set; }

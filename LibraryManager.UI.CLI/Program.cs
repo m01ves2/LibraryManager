@@ -95,7 +95,7 @@ namespace LibraryManager.UI.CLI
 
         private static void DisplayResult<T>(ViewResult<T> result, Func<T, string> formatter)
         {
-            if (!result.IsSuccess) {
+            if (result.Status != ViewResultStatus.Success) {
                 Console.WriteLine(result.Message);
                 return;
             }

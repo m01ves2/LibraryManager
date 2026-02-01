@@ -11,7 +11,7 @@ namespace LibraryManager.Application.Mappers
             {
                 Status = ResultStatusMapper.ToViewStatus(operationResult.Status),
                 Message = operationResult.Message,
-                Data = operationResult.IsSuccess ? mapFunc(operationResult.Data) : default!
+                Data = operationResult.Status == ResultStatus.Success ? mapFunc(operationResult.Data) : default!
             };
         }
     }

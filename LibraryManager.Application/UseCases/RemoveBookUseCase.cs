@@ -17,8 +17,8 @@ namespace LibraryManager.Application.UseCases
         public OperationResult<Book> Execute(Isbn isbn)
         {
             OperationResult<Book> result = _repository.FindBook(b => b.Isbn == isbn);
-            if (!result.IsSuccess)
-                return OperationResult<Book>.Fail(ResultStatus.NotFound, $"Book to delete with {isbn.Value} does not exist");
+            if (result.Status != ResultStatus.Success)
+                return new OperationResult<Book>(ResultStatus.NotFound, $"Book to delete with {isbn.Value} does not exist");
 
             return _repository.RemoveBook(result.Data);
         }

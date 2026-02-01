@@ -5,7 +5,7 @@ namespace LibraryManager.Domain.Entities
 {
     public class Author
     {
-        public int Id { get; private set; } //technical id for DB
+        public int Id { get; internal set; } //technical id for DB
         public string Name { get; private set; }
 
         public Author(string name) 
@@ -18,7 +18,8 @@ namespace LibraryManager.Domain.Entities
         public OperationResult<Author> ChangeName(string newName)
         {
             if (string.IsNullOrWhiteSpace(newName)) {
-                return OperationResult<Author>.Fail(ResultStatus.AuthorMissing, "Author name cannot be empty");
+                //return OperationResult<Author>.Fail( ResultStatus.AuthorMissing, "Author name cannot be empty");
+                return new OperationResult<Author>(ResultStatus.AuthorMissing, "Author name cannot be empty");
             }
             Name = newName;
             return OperationResult<Author>.Ok(this);

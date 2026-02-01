@@ -22,40 +22,41 @@ namespace LibraryManager.Application.Handlers
 
         public ViewResult<ViewBook> Handle(RemoveBookRequest dto)
         {
-            var isbnResult = ResolveIsbn(dto);
-            if (!isbnResult.IsSuccess)
+            var idResult = ResolveBookId(dto);
+            if (isbnResult.Status != ResultStatus.Success)
                 return new ViewResult<ViewBook>()
                 {
                     Status = ResultStatusMapper.ToViewStatus(isbnResult.Status),
                     Message = isbnResult.Message
                 };
 
-            ViewResult<ViewBook> viewResult =  ResultMapper.ToViewResult(_useCase.Execute(isbnResult.Data), BookMapper.ToViewBook);
+            OperationResult<Book> result = _useCase.Execute(isbnResult.Data);
+            ViewResult<ViewBook> viewResult =  ResultMapper.ToViewResult(result, BookMapper.ToViewBook);
             return viewResult;
         }
 
-        private OperationResult<Isbn> ResolveIsbn(RemoveBookRequest dto)
+        private OperationResult<Isbn> ResolveBookId(RemoveBookRequest dto)
         {
             if (!string.IsNullOrWhiteSpace(dto.Isbn))
                 return Isbn.TryParse(dto.Isbn);
 
             if (dto.BookId.HasValue) {
                 var bookResult = _repository.FindBook(b => b.Id == dto.BookId.Value);
-                if (!bookResult.IsSuccess)
-                    return OperationResult<Isbn>.Fail(ResultStatus.NotFound, "Book not found");
+                if (bookResult.Status != ResultStatus.Success)
+                    return new OperationResult<Isbn>(ResultStatus.NotFound, "Book not found");
 
                 return OperationResult<Isbn>.Ok(bookResult.Data.Isbn);
             }
 
             if (!string.IsNullOrWhiteSpace(dto.Title)) {
                 var books = _repository.FindAllBooks(b => b.Title == dto.Title);
-                if (!books.IsSuccess || books.Data.Count != 1)
-                    return OperationResult<Isbn>.Fail(ResultStatus.Ambiguous, "Title is ambiguous");
+                if (books.Status != ResultStatus.Success || books.Data.Count != 1)
+                    return new OperationResult<Isbn>(ResultStatus.Ambiguous, "Title is ambiguous");
 
                 return OperationResult<Isbn>.Ok(books.Data[0].Isbn);
             }
 
-            return OperationResult<Isbn>.Fail(ResultStatus.InvalidRequest, "No identifier provided");
+            return new OperationResult<Isbn>(ResultStatus.InvalidRequest, "No identifier provided");
         }
     }
 }

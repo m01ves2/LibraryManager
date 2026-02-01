@@ -34,7 +34,7 @@ namespace LibraryManager.Application.Handlers
                 isbn = isbnResult.Data;
             }
 
-            OperationResult<List<Book>> operationResult = _useCase.Execute(dto.Title, author, isbn);
+            OperationResult<List<Book>> operationResult = _useCase.Execute(dto.Id, dto.Title, author, isbn);
             ViewResult<List<ViewBook>> viewResult = ResultMapper.ToViewResult(operationResult, BookMapper.ToViewBooks);
             return viewResult;
         }

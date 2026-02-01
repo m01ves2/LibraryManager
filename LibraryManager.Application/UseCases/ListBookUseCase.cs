@@ -14,9 +14,12 @@ namespace LibraryManager.Application.UseCases
             _repository = repository;
         }
 
-        public OperationResult<List<Book>> Execute(string title, Author author, Isbn isbn)
+        public OperationResult<List<Book>> Execute(int? id, string? title, Author? author, Isbn? isbn)
         {
             Func<Book, bool> predicate = book => true;
+
+            if (id is not null)
+                predicate = And(predicate, b => b.Id == id);
 
             if (!string.IsNullOrWhiteSpace(title))
                 predicate = And(predicate, b => b.Title == title);
