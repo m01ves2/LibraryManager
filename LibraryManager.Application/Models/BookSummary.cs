@@ -1,4 +1,4 @@
-﻿namespace LibraryManager.Application.Response
+﻿namespace LibraryManager.Application.Models
 {
     public class BookSummary
     {

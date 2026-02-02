@@ -1,13 +1,13 @@
 ﻿namespace LibraryManager.Application.Requests
 {
-    public class ListBookRequest
+    public class ListBooksRequest
     {
         private const int MaxPageSize = 50;
 
         public int PageNumber { get; }
         public int PageSize { get; }
 
-        public ListBookRequest(int pageNumber, int pageSize)
+        public ListBooksRequest(int pageNumber, int pageSize)
         {
             if (pageNumber < 1)
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "PageNumber must be >= 1");

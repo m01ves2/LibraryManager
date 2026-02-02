@@ -35,7 +35,7 @@ namespace LibraryManager.UI.CLI
                         break;
                     case "list books":
                         // выводим все книги из репозитория
-                        ListBookRequest listBookRequest = ListBookRequestMenu();
+                        ListBooksRequest listBookRequest = ListBookRequestMenu();
                         ViewResult<List<ViewBook>> listResult = listHandler.Handle(listBookRequest);
 
                         DisplayResult<List<ViewBook>>(listResult, books => string.Join(Environment.NewLine, books.Select(b => $"({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value})")));
@@ -88,7 +88,7 @@ namespace LibraryManager.UI.CLI
             return new RemoveBookRequest { Title = title };
         }
 
-        private static ListBookRequest ListBookRequestMenu()
+        private static ListBooksRequest ListBookRequestMenu()
         {
             throw new NotImplementedException();
         }
