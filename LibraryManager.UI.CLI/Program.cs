@@ -16,24 +16,24 @@ namespace LibraryManager.UI.CLI
 
             while (true) {
                 Console.Clear();
-                Console.WriteLine("Input command (add/remove/list/exit):");
+                Console.WriteLine("Input command (add author|book\nremove author|book\nlist authors|books\nexit):");
                 var command = Console.ReadLine();
                 switch (command) {
-                    case "add":
+                    case "add book":
                         // собираем данные из консоли и вызываем addHandler.Handle
                         AddBookRequest addBookRequest = AddBookMenu();
                         ViewResult<ViewBook> addResult = addHandler.Handle(addBookRequest);
                         
                         DisplayResult<ViewBook>(addResult, b => $"Book ({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value}) added");
                         break;
-                    case "remove":
+                    case "remove book":
                         // собираем данные (BookId, Title или Isbn) и вызываем removeHandler.Handle
                         RemoveBookRequest removeBookRequest = RemoveBookRequestMenu();
                         ViewResult<ViewBook> removeResult = removeHandler.Handle(removeBookRequest);
                         
                         DisplayResult<ViewBook>(removeResult, b => $"Book ({b.Title} by {b.Author.Name}, ISBN: {b.Isbn.Value}) removed");
                         break;
-                    case "list":
+                    case "list books":
                         // выводим все книги из репозитория
                         ListBookRequest listBookRequest = ListBookRequestMenu();
                         ViewResult<List<ViewBook>> listResult = listHandler.Handle(listBookRequest);

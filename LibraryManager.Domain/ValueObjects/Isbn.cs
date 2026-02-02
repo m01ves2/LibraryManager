@@ -1,5 +1,4 @@
 ﻿using LibraryManager.Domain.Exceptions;
-using LibraryManager.Domain.Results;
 using System.Text.RegularExpressions;
 
 namespace LibraryManager.Domain.ValueObjects
@@ -18,8 +17,8 @@ namespace LibraryManager.Domain.ValueObjects
             if(ReferenceEquals(this, obj))
                 return true;
 
-            if (obj is Isbn otherIsbn) { 
-                return this.Value == otherIsbn.Value;
+            if (obj is Isbn other) { 
+                return Value == other.Value;
             }
             return false;
         }
@@ -43,20 +42,9 @@ namespace LibraryManager.Domain.ValueObjects
 
         public static Isbn Parse(string value)
         {
-            var result = TryParse(value);
-
-            if (result.Status != ResultStatus.Success)
-                throw new DomainValidationException(result.Message);
-
-            return result.Data;
-        }
-
-        public static OperationResult<Isbn> TryParse(string value)
-        {
             if (!IsValid(value))
-                return new OperationResult<Isbn>( ResultStatus.InvalidIsbn, "Invalid ISBN format");
-
-            return OperationResult<Isbn>.Ok(new Isbn(value));
+                throw new DomainValidationException("Invalid ISBN format");
+            return new Isbn(value);
         }
 
         public static bool IsValid(string value)

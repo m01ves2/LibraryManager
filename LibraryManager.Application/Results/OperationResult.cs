@@ -1,4 +1,4 @@
-﻿namespace LibraryManager.Domain.Results
+﻿namespace LibraryManager.Application.Results
 {
     public enum ResultStatus
     {

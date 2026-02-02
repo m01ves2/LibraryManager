@@ -2,9 +2,21 @@
 {
     public class ListBookRequest
     {
-        public int? Id { get; set; }
-        public string? Title { get; set; }
-        public int? AuthorId { get; set; }
-        public string? Isbn { get; set; }
+        private const int MaxPageSize = 50;
+
+        public int PageNumber { get; }
+        public int PageSize { get; }
+
+        public ListBookRequest(int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "PageNumber must be >= 1");
+
+            if (pageSize < 1 || pageSize > MaxPageSize)
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"PageSize must be between 1 and {MaxPageSize}");
+
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+        }
     }
 }

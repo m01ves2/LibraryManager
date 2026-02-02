@@ -1,5 +1,4 @@
 ﻿using LibraryManager.Domain.Exceptions;
-using LibraryManager.Domain.Results;
 using LibraryManager.Domain.ValueObjects;
 
 namespace LibraryManager.Domain.Entities
@@ -14,72 +13,42 @@ namespace LibraryManager.Domain.Entities
         
         public Book(string title, string description, Author author, Isbn isbn)
         {
-            Title = title;      
             if (string.IsNullOrWhiteSpace(title))
-                throw new InvalidBookException("InvalidBookException: Title cannot be empty.");
+                throw new InvalidBookException("Title cannot be empty");
 
+            Title = title;
             Description = description;
-
             Author = author ?? throw new DomainValidationException("Author cannot be null");
-
-            Isbn = isbn;
+            Isbn = isbn ?? throw new DomainValidationException("ISBN cannot be null");
         }
 
-        public OperationResult<Book> UpdateBook(Book other)
+        public void UpdateBook(Book other)
         {
-            // Используем уже существующие методы ChangeX
-            var titleResult = UpdateTitle(other.Title);
-            var descResult = UpdateDescription(other.Description);
-            var isbnResult = UpdateIsbn(other.Isbn);
-            var authorResult = UpdateAuthor(other.Author);
-
-            // Проверяем результаты
-            if (titleResult.Status != ResultStatus.Success) return titleResult;
-            if (descResult.Status != ResultStatus.Success) return descResult;
-            if (isbnResult.Status != ResultStatus.Success) return isbnResult;
-            if (authorResult.Status != ResultStatus.Success) return authorResult;
-
-            return OperationResult<Book>.Ok(this);
+            UpdateTitle(other.Title);
+            UpdateDescription(other.Description);
+            UpdateIsbn(other.Isbn);
+            UpdateAuthor(other.Author);
         }
 
-        public OperationResult<Book> UpdateTitle(string newTitle)
+        public void UpdateTitle(string newTitle)
         {
-            if (string.IsNullOrEmpty(newTitle)) {
-                return new OperationResult<Book>(ResultStatus.BookMissing, "Book title cannot be empty");
-            }
+            if (string.IsNullOrWhiteSpace(newTitle))
+                throw new InvalidBookException("Book title cannot be empty");
             Title = newTitle;
-            return OperationResult<Book>.Ok(this);
         }
 
-        public OperationResult<Book> UpdateDescription(string? newDescription)
+        public void UpdateDescription(string? newDescription)
         {
-            if (string.IsNullOrWhiteSpace(newDescription))
-                return new OperationResult<Book>(ResultStatus.BookMissing, "Book description is empty");
-            
-            Description = newDescription;
-            return OperationResult<Book>.Ok(this);
+            Description = newDescription; // допускаем пустое описание
         }
 
-        public OperationResult<Book> UpdateIsbn(Isbn newIsbn)
+        public void UpdateIsbn(Isbn newIsbn)
         {
-            //if (!Isbn.IsValid(newIsbn))
-            //    return OperationResult<Book>.Fail(ResultStatus.InvalidIsbn, "ISBN is invalid");
-            //Isbn = Isbn.Parse(newIsbn); // теперь безопасно, т.к. IsValid проверили
-            
-            if(newIsbn is null) {
-                return new OperationResult<Book>(ResultStatus.InvalidIsbn, "ISBN is invalid");
-            }
-            Isbn = newIsbn;
-            return OperationResult<Book>.Ok(this);
+            Isbn = newIsbn ?? throw new DomainValidationException("ISBN cannot be null");
         }
-
-        public OperationResult<Book> UpdateAuthor(Author newAuthor)
+        public void UpdateAuthor(Author newAuthor)
         {
-            if(newAuthor is null) {
-                return new OperationResult<Book>(ResultStatus.BookMissing, "Author is empty");
-            }
-            Author = newAuthor;
-            return OperationResult<Book>.Ok(this);
+            Author = newAuthor ?? throw new DomainValidationException("Author cannot be null");
         }
     }
 }
