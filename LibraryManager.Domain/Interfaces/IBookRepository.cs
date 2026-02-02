@@ -6,11 +6,12 @@ namespace LibraryManager.Domain.Interfaces
     public interface IBookRepository
     {
         // Books
-        void AddBook(Book book);
-        Book? GetBookById(int id);
-        Book? GetBookByIsbn(Isbn isbn);
-        IReadOnlyList<Book> GetBooks(int skip, int take);
-        int GetBooksCount();
-        void RemoveBook(Book book);
+        void Add(Book book);
+        int Count();
+        Book? GetById(int id);
+        Book? GetByIsbn(Isbn isbn);
+        IReadOnlyList<Book> GetPaged(int skip, int take);
+        void Remove(Book book);
+        void RemoveById(int id);
     }
 }
