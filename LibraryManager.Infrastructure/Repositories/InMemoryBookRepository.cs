@@ -42,7 +42,7 @@ namespace LibraryManager.Infrastructure.Repositories
             if (book is null)
                 throw new ArgumentNullException(nameof(book));
 
-            if (_books.Remove(book))
+            if (!_books.Remove(book))
                 throw new InvalidOperationException("Book to delete not found");
         }
 

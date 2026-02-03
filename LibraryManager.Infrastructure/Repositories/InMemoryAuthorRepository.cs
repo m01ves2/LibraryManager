@@ -33,7 +33,7 @@ namespace LibraryManager.Infrastructure.Repositories
             if (author is null)
                 throw new ArgumentNullException(nameof(author));
 
-            if (_authors.Remove(author))
+            if (!_authors.Remove(author))
                 throw new InvalidOperationException("Author to delete not found");
         }
 
