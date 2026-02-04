@@ -27,6 +27,11 @@ namespace LibraryManager.Infrastructure.Repositories
             return _books.FirstOrDefault(b => b.Isbn == isbn);
         }
 
+        //public IReadOnlyList<Book> GetPagedByAuthor(int skip, int take, Author author)
+        //{
+        //    return _books.Where(b => b.Author == author).Skip(skip).Take(take).ToList();
+        //}
+
         public IReadOnlyList<Book> GetPaged(int skip, int take)
         {
             return _books.Skip(skip).Take(take).ToList();
@@ -37,6 +42,11 @@ namespace LibraryManager.Infrastructure.Repositories
             return _books.Count;
         }
 
+        public bool HasBooksByAuthorId(int authorId)
+        {
+            return _books.Where(b => b.Author.Id == authorId).Count() > 0;
+        }
+
         public void Remove(Book book)
         {
             if (book is null)
@@ -44,14 +54,6 @@ namespace LibraryManager.Infrastructure.Repositories
 
             if (!_books.Remove(book))
                 throw new InvalidOperationException("Book to delete not found");
-        }
-
-        public void RemoveById(int id)
-        {
-            var book = GetById(id);
-            if (book == null)
-                throw new KeyNotFoundException($"Book {id} not found");
-            _books.Remove(book);
         }
     }
 }

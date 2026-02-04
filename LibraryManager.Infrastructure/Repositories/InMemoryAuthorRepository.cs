@@ -37,14 +37,6 @@ namespace LibraryManager.Infrastructure.Repositories
                 throw new InvalidOperationException("Author to delete not found");
         }
 
-        public void RemoveById(int id)
-        {
-            var author = GetById(id);
-            if (author == null)
-                throw new KeyNotFoundException($"Author {id} not found");
-            _authors.Remove(author);
-        }
-
         public int Count()
         {
             return _authors.Count;

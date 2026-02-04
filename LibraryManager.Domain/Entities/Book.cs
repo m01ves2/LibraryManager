@@ -11,7 +11,7 @@ namespace LibraryManager.Domain.Entities
         public string? Description { get; private set; } //необязательное поле, можно менять
         public Isbn  Isbn { get; private set; }
         
-        public Book(string title, string description, Author author, Isbn isbn)
+        public Book(string title, string? description, Author author, Isbn isbn)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new InvalidBookException("Title cannot be empty");

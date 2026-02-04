@@ -2,14 +2,14 @@
 {
     public class BookSummary
     {
-        public int BookId { get; }
+        public int Id { get; }
         public string Title { get; }
         public string AuthorName { get; }
-        public string? Isbn { get; }
+        public string Isbn { get; }
 
-        public BookSummary(int bookId, string title, string authorName, string? isbn)
+        public BookSummary(int id, string title, string authorName, string isbn)
         {
-            BookId = bookId;
+            Id = id;
             Title = title;
             AuthorName = authorName;
             Isbn = isbn;

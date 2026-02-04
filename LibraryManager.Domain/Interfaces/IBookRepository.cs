@@ -11,7 +11,7 @@ namespace LibraryManager.Domain.Interfaces
         Book? GetById(int id);
         Book? GetByIsbn(Isbn isbn);
         IReadOnlyList<Book> GetPaged(int skip, int take);
+        bool HasBooksByAuthorId(int id);
         void Remove(Book book);
-        void RemoveById(int id);
     }
 }

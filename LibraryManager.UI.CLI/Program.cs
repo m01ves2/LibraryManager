@@ -4,6 +4,7 @@ using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Infrastructure.Repositories;
+using System.Net;
 
 namespace LibraryManager.UI.CLI
 {
@@ -13,75 +14,121 @@ namespace LibraryManager.UI.CLI
         {
             var uow = new InMemoryUnitOfWork(); //TODO сделать по уму CR! сейчас у нас транзитивная зависимость от Infrastructure через другие слои!!
             var listBooksUseCase = new ListBooksUseCase(uow);
+            var listAuthorsUseCase = new ListAuthorsUseCase(uow);
+            var addAuthorUseCase = new AddAuthorUseCase(uow);
+            var addBookUseCase = new AddBookUseCase(uow);
+            var removeAuthorUseCase = new RemoveAuthorUseCase(uow);
+            var removeBookUseCase = new RemoveBookUseCase(uow);
 
             AddMockData(uow);
 
             while (true) {
                 //Console.Clear();
-                Console.WriteLine("Input command (add author|book\nremove author|book\nlist authors|books\nexit):");
+                Console.WriteLine("Input command:\n list authors|books\n add author|book\n remove author|book\nexit:");
                 var command = Console.ReadLine();
                 switch (command) {
                     case "list books":
                         // выводим все книги из репозитория
-                        ListBooksRequest listBookRequest = ListBookRequestMenu();
-                        //ViewResult<List<ViewBook>> listResult = listHandler.Handle(listBookRequest);
-                        OperationResult<ListBooksResult> listResult = listBooksUseCase.Execute(listBookRequest);
-
-                        DisplayResult<ListBooksResult>(listResult, books => string.Join(Environment.NewLine, books.Books.Select(b => $"({b.Title} by {b.AuthorName}, ISBN: {b.Isbn})")));
-
+                        ListBooksRequest listBookRequest = ListBooksRequestMenu();
+                        OperationResult<ListBooksResult> listBooksResult = listBooksUseCase.Execute(listBookRequest);
+                        DisplayResult<ListBooksResult>(listBooksResult, books => string.Join(Environment.NewLine, books.Books.Select(b => $"({b.Title} by {b.AuthorName}, ISBN: {b.Isbn})")));
                         break;
+
+                    case "list authors":
+                        ListAuthorsRequest listAuthorsRequest = ListAuthorsRequestMenu();
+                        OperationResult<ListAuthorsResult> listAuthorsResult = listAuthorsUseCase.Execute(listAuthorsRequest);
+                        DisplayResult<ListAuthorsResult>(listAuthorsResult, authors => string.Join(Environment.NewLine, authors.Authors.Select(a => $"{a.Name}")));
+                        break;
+
+                    case "add author":
+                        AddAuthorRequest addAuthorRequest = AddAuthorRequestMenu();
+                        OperationResult<AddAuthorResult> addAuthorResult = addAuthorUseCase.Execute(addAuthorRequest);
+                        DisplayResult<AddAuthorResult>(addAuthorResult, a => $"Author {a.Name} added");
+                        break;
+
+                    case "add book":
+                        AddBookRequest addBookRequest = AddBookRequestMenu();
+                        OperationResult<AddBookResult> addBookResult = addBookUseCase.Execute(addBookRequest);
+                        DisplayResult<AddBookResult>(addBookResult, b => $"Book {b.Title} added");
+                        break;
+
+                    case "remove author":
+                        RemoveAuthorRequest removeAuthorRequest = RemoveAuthorRequestMenu();
+                        OperationResult<bool> removeAuthorResult = removeAuthorUseCase.Execute(removeAuthorRequest);
+                        DisplayResult<bool>(removeAuthorResult, a => $"Author {removeAuthorRequest.Name} removed");
+                        break;
+
+                    case "remove book":
+                        RemoveBookRequest removeBookRequest = RemoveBookRequestMenu();
+                        OperationResult<bool> removeBookResult = removeBookUseCase.Execute(removeBookRequest);
+                        DisplayResult<bool>(removeBookResult, a => $"Book {removeBookRequest.Title} removed");
+                        break;
+
                     case "exit":
                         return;
                 }
+                Console.WriteLine("===");
             }
         }
 
-        //private static AddBookRequest AddBookMenu()
-        //{
-        //    Console.Clear();
-
-        //    Console.WriteLine("Input Title: ");
-        //    string? title = Console.ReadLine();
-
-        //    Console.WriteLine("Input Description (or leave empty): ");
-        //    string? description = Console.ReadLine();
-
-        //    Console.WriteLine("Input AuthorId: ");
-        //    string? idInput = Console.ReadLine();
-        //    int.TryParse(idInput, out var authorId);
-
-        //    Console.WriteLine("Input ISBN: ");
-        //    string isbn = Console.ReadLine() ?? "";
-
-        //    return new AddBookRequest() { Title = title, Description = description, Isbn = isbn, AuthorId = authorId };
-        //}
-
-        //private static RemoveBookRequest RemoveBookRequestMenu()
-        //{
-        //    Console.Clear();
-
-        //    Console.WriteLine("Input ISBN (or leave empty):");
-        //    string isbn = Console.ReadLine() ?? "";
-
-        //    if (!string.IsNullOrEmpty(isbn)) {
-        //        return new RemoveBookRequest() { Isbn = isbn };
-        //    }
-
-        //    Console.WriteLine("Input BookId (or leave empty):");
-        //    string? idInput = Console.ReadLine();
-        //    if (int.TryParse(idInput, out int bookId))
-        //        return new RemoveBookRequest { BookId = bookId };
-
-        //    Console.WriteLine("Input Title:");
-        //    string? title = Console.ReadLine();
-        //    return new RemoveBookRequest { Title = title };
-        //}
-
-        private static ListBooksRequest ListBookRequestMenu()
+        private static ListBooksRequest ListBooksRequestMenu()
         {
-            //throw new NotImplementedException();
             ListBooksRequest listBooksRequest = new ListBooksRequest(1, 50);
             return listBooksRequest;
+        }
+
+        private static ListAuthorsRequest ListAuthorsRequestMenu()
+        {
+            //throw new NotImplementedException();
+            ListAuthorsRequest listAuthorsRequest = new ListAuthorsRequest(1, 50);
+            return listAuthorsRequest;
+        }
+
+        private static AddAuthorRequest AddAuthorRequestMenu()
+        {    
+            Console.WriteLine("Input Name: ");
+            string? name = Console.ReadLine() ?? "";
+
+            return new AddAuthorRequest(name);
+        }
+
+        private static AddBookRequest AddBookRequestMenu()
+        {
+            Console.WriteLine("Input Title: ");
+            string title = Console.ReadLine() ?? "";
+
+            Console.WriteLine("Input Description (or leave empty): ");
+            string description = Console.ReadLine() ?? "";
+
+            Console.WriteLine("Input AuthorName: ");
+            string authorName = Console.ReadLine() ?? "";
+
+            Console.WriteLine("Input ISBN: ");
+            string isbn = Console.ReadLine() ?? "";
+
+            return new AddBookRequest(title, description, authorName, isbn);
+        }
+
+        private static RemoveBookRequest RemoveBookRequestMenu()
+        {
+            Console.WriteLine("Input BookId:");
+            string idInput = Console.ReadLine() ?? "";
+            int bookId = int.Parse(idInput);
+
+            Console.WriteLine("Input Title:");
+            string? title = Console.ReadLine();
+            return new RemoveBookRequest(bookId, title);
+        }
+
+        private static RemoveAuthorRequest RemoveAuthorRequestMenu()
+        {
+            Console.WriteLine("Input AuthorId:");
+            string idInput = Console.ReadLine() ?? "";
+            int authorId = int.Parse(idInput);
+
+            Console.WriteLine("Input Name:");
+            string? name = Console.ReadLine();
+            return new RemoveAuthorRequest(authorId, name);
         }
 
         private static void DisplayResult<T>(OperationResult<T> result, Func<T, string> formatter)
