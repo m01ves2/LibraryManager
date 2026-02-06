@@ -19,7 +19,7 @@ namespace LibraryManager.Application.UseCases
             try {
                 //Author author = new Author(addAuthorRequest.Name);
                 Author? author = _uow.Authors.GetByName(addAuthorRequest.Name);
-                if (author != null)
+                if (author is not null)
                     return new OperationResult<AddAuthorResult>(ResultStatus.Duplicate, $"Author {addAuthorRequest.Name} already exists");
 
                 author = new Author(addAuthorRequest.Name);

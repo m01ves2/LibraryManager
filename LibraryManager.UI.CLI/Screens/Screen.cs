@@ -15,10 +15,8 @@ namespace LibraryManager.UI.CLI.Screens
         public Screen Run()
         {
             Console.Clear();
-
-            LoadData();
-
             RenderHeader();
+            LoadData();
             RenderBody();
             RenderControls();
 
@@ -33,6 +31,7 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine($"\t{Title}");
             RenderHeaderDetails();
             Console.WriteLine("============================");
+            Console.WriteLine();
         }
 
         protected virtual void RenderHeaderDetails() { }
@@ -43,6 +42,6 @@ namespace LibraryManager.UI.CLI.Screens
         {
             return Console.ReadLine() ?? string.Empty;
         }
-        protected abstract Screen HandleInput(string input);
+        protected abstract Screen? HandleInput(string input);
     }
 }

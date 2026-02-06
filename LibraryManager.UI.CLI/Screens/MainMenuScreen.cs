@@ -1,5 +1,4 @@
 ﻿using LibraryManager.Domain.Interfaces;
-using LibraryManager.Infrastructure.Repositories;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -13,7 +12,7 @@ namespace LibraryManager.UI.CLI.Screens
 
         protected override void RenderBody()
         {
-            Console.WriteLine("Welcome to Library Manager\n");
+            Console.WriteLine("Welcome to Library Manager");
         }
 
         protected override void RenderControls()
@@ -29,21 +28,21 @@ namespace LibraryManager.UI.CLI.Screens
             Console.Write("\nSelect option: ");
         }
 
-        protected override Screen HandleInput(string input)
+        protected override Screen? HandleInput(string input)
         {
             switch (input) {
                 case "1":
                     return new ListBooksScreen(new ListBooksContext(1, 3), _uow);
-                //case "2":
-                //    return new ListAuthorsScreen(_uow);
-                //case "3":
-                //    return new AddBookScreen(_uow);
-                //case "4":
-                //    return new AddAuthorScreen(_uow);
-                //case "5":
-                //    return new RemoveBookScreen(_uow);
-                //case "6":
-                //    return new RemoveAuthorScreen(_uow);
+                case "2":
+                    return new ListAuthorsScreen(new ListAuthorsContext(1,3), _uow);
+                case "3":
+                    return new AddBookScreen(_uow);
+                case "4":
+                    return new AddAuthorScreen(_uow);
+                case "5":
+                    return new RemoveBookScreen(_uow);
+                case "6":
+                    return new RemoveAuthorScreen(_uow);
                 case "0":
                     return null;
                 default:

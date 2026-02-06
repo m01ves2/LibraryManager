@@ -6,24 +6,24 @@ using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
 {
-    public class ListBooksScreen : Screen
+    public class ListAuthorsScreen : Screen
     {
-        protected override string Title => "BOOKS";
-        private ListBooksUseCase _useCase;
-        private ListBooksContext _context;
-        private ResultStatus _status;
+        protected override string Title => "AUTHORS";
+        private ListAuthorsUseCase _useCase;
+        private ListAuthorsContext _context;
 
-        private ListBooksResult? _data;
+        private ListAuthorsResult? _data;
+        private ResultStatus _status;
         private string? _error;
 
-        public ListBooksScreen(ListBooksContext context, IUnitOfWork uow) : base(uow)
+        public ListAuthorsScreen(ListAuthorsContext context, IUnitOfWork uow) : base(uow)
         {
             _context = context;
-            _useCase = new ListBooksUseCase(uow);
+            _useCase = new ListAuthorsUseCase(uow);
         }
         protected override void LoadData()
         {
-            var request = new ListBooksRequest(_context.PageNumber, _context.PageSize);
+            var request = new ListAuthorsRequest(_context.PageNumber, _context.PageSize);
             var result = _useCase.Execute(request);
 
             if (result.Status == ResultStatus.Success)
@@ -48,20 +48,20 @@ namespace LibraryManager.UI.CLI.Screens
             if (_data == null)
                 return;
 
-            var books = _data.Books;
-            for (int i = 1; i <= books.Count; i++) {
-                //Console.WriteLine($"{i + (_context.PageNumber - 1)*_context.PageSize}. {books[i - 1].Title} by {books[i - 1].AuthorName}, ISBN: {books[i - 1].Isbn}");
-                Console.WriteLine($"{books[i - 1].Id}. {books[i - 1].Title} by {books[i - 1].AuthorName}, ISBN: {books[i - 1].Isbn}"); //we have to use Id's for CLI (Clean Architecture)
+            var authors = _data.Authors;
+            for (int i = 1; i <= authors.Count; i++) {
+                //Console.WriteLine($"{i + (_context.PageNumber - 1) * _context.PageSize}. {authors[i - 1].Name}");
+                Console.WriteLine($"{authors[i-1].Id}. {authors[i - 1].Name}"); //we have to use Id's for CLI (Clean Architecture)
             }
 
-            for (int i = 0; i < _data.PageSize - books.Count; i++) {
+            for (int i = 0; i < _data.PageSize - authors.Count; i++) {
                 Console.WriteLine();
             }
         }
 
         protected override void RenderControls()
         {
-            if (_data is null || _data.Books.Count == 0) {
+            if (_data is null || _data.Authors.Count == 0) {
 
             }
             else {
@@ -88,13 +88,13 @@ namespace LibraryManager.UI.CLI.Screens
 
             switch (input) {
                 case "1" when _data.HasPreviousPage:
-                    var newContextPrev = new ListBooksContext(_data.PageNumber - 1, _context.PageSize);
-                    return new ListBooksScreen(newContextPrev, _uow);
+                    var newContextPrev = new ListAuthorsContext(_data.PageNumber - 1, _context.PageSize);
+                    return new ListAuthorsScreen(newContextPrev, _uow);
 
 
                 case "2" when _data.HasNextPage:
-                    var newContextNext = new ListBooksContext(_data.PageNumber + 1, _context.PageSize);
-                    return new ListBooksScreen(newContextNext, _uow);
+                    var newContextNext = new ListAuthorsContext(_data.PageNumber + 1, _context.PageSize);
+                    return new ListAuthorsScreen(newContextNext, _uow);
 
                 case "0":
                     return new MainMenuScreen(_uow);

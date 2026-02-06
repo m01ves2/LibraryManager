@@ -24,7 +24,7 @@ namespace LibraryManager.Application.UseCases
                 }
 
                 if (_uow.Books.HasBooksByAuthorId(removeAuthorRequest.Id)) {
-                    return OperationResult<bool>.Fail($"Author {removeAuthorRequest.Name} has books. Remove add his books");
+                    return new OperationResult<bool>( ResultStatus.BookMissing, $"Author {removeAuthorRequest.Name} has books. Remove his books");
                 }
 
                 _uow.Authors.Remove(author);
