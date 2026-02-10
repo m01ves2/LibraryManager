@@ -17,12 +17,7 @@ namespace LibraryManager.Application.UseCases
         public OperationResult<AddAuthorResult> Execute(AddAuthorRequest addAuthorRequest)
         {
             try {
-                //Author author = new Author(addAuthorRequest.Name);
-                Author? author = _uow.Authors.GetByName(addAuthorRequest.Name);
-                if (author is not null)
-                    return new OperationResult<AddAuthorResult>(ResultStatus.Duplicate, $"Author {addAuthorRequest.Name} already exists");
-
-                author = new Author(addAuthorRequest.Name);
+                Author? author = new Author(addAuthorRequest.Name);
                 _uow.Authors.Add(author);
                 _uow.Commit();
                 AddAuthorResult addAuthorResult = new AddAuthorResult(author.Id, author.Name);
@@ -30,7 +25,7 @@ namespace LibraryManager.Application.UseCases
             }
             catch (Exception ex) {
                 // Любые неожиданные исключения централизованно обрабатываем
-                return OperationResult<AddAuthorResult>.Fail(ex.Message);
+                return OperationResult<AddAuthorResult>.Error(ex.Message);
             }
         }
     }

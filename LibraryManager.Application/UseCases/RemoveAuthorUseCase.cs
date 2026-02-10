@@ -20,11 +20,11 @@ namespace LibraryManager.Application.UseCases
                 Author? author = _uow.Authors.GetById(removeAuthorRequest.Id);
 
                 if(author is null) {
-                    return new OperationResult<bool>(ResultStatus.NotFound, $"Author {removeAuthorRequest.Name} not found");
+                    return OperationResult<bool>.NotFound($"Author not found");
                 }
 
                 if (_uow.Books.HasBooksByAuthorId(removeAuthorRequest.Id)) {
-                    return new OperationResult<bool>( ResultStatus.BookMissing, $"Author {removeAuthorRequest.Name} has books. Remove his books");
+                    return OperationResult<bool>.Conflict($"There are author's books. Remove books first");
                 }
 
                 _uow.Authors.Remove(author);
@@ -32,7 +32,7 @@ namespace LibraryManager.Application.UseCases
                 return OperationResult<bool>.Ok(true);
             }
             catch (Exception ex) {
-                return OperationResult<bool>.Fail(ex.Message);
+                return OperationResult<bool>.Error(ex.Message);
             }
         }
     }

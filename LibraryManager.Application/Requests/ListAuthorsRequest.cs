@@ -2,12 +2,13 @@
 {
     public class ListAuthorsRequest
     {
-        private const int MaxPageSize = 50;
+        private const int MaxPageSize = 10;
 
         public int PageNumber { get; }
         public int PageSize { get; }
+        public string? NameContains { get; }
 
-        public ListAuthorsRequest(int pageNumber, int pageSize)
+        public ListAuthorsRequest(int pageNumber, int pageSize, string? nameContains = null)
         {
             if (pageNumber < 1)
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "PageNumber must be >= 1");
@@ -17,6 +18,7 @@
 
             PageNumber = pageNumber;
             PageSize = pageSize;
+            NameContains = nameContains;
         }
     }
 }

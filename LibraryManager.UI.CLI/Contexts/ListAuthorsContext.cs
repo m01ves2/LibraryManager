@@ -4,7 +4,8 @@
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
-
+        public int? AuthorId { get; set; }
+        public string? AuthorName { get; set; }
         public ListAuthorsContext(int pageNumber, int pageSize)
         {
             PageNumber = pageNumber;

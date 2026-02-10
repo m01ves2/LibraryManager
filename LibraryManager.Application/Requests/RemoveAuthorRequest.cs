@@ -3,11 +3,9 @@
     public class RemoveAuthorRequest
     {
         public int Id { get; }
-        public string? Name { get; }
-        public RemoveAuthorRequest(int id, string? name = null)
+        public RemoveAuthorRequest(int id)
         {
             Id = id;
-            Name = name;
         }
     }
 }

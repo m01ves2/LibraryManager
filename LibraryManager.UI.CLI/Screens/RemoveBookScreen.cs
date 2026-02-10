@@ -9,32 +9,31 @@ namespace LibraryManager.UI.CLI.Screens
     {
         protected override string Title => "REMOVE BOOK";
         private RemoveBookUseCase _useCase;
+        
         private string? _error;
         private ResultStatus _status;
 
-        public RemoveBookScreen(IUnitOfWork uow) : base(uow)
+        public RemoveBookScreen(IUnitOfWork uow, Screen? previous) : base(uow, previous)
         {
             _useCase = new RemoveBookUseCase(uow);
         }
 
         protected override void LoadData()
         {
-            //For the future
-            //int index = int.Parse(input) - 1;
-            //if (index < 0 || index >= _data.Books.Count)
-            //    return this;
-
-            //var bookId = _data.Books[index].Id;
-            //_removeBookUseCase.Execute(new RemoveBookRequest(bookId));
+            _status = ResultStatus.Success;
+            _error = null;
 
             Console.WriteLine("Input BookId:");
             string idInput = Console.ReadLine() ?? "";
-            int id = int.Parse(idInput);
 
-            Console.WriteLine("Input Title:");
-            string? title = Console.ReadLine();
+            if (!int.TryParse(idInput, out int id)) {
+                _status = ResultStatus.InvalidInput;
+                _error = "Invalid number";
+                return;
+            }
 
-            var request = new RemoveBookRequest(id, title);
+
+            var request = new RemoveBookRequest(id);
             var result = _useCase.Execute(request);
 
             if (result.Status != ResultStatus.Success) {
@@ -59,15 +58,15 @@ namespace LibraryManager.UI.CLI.Screens
         }
         protected override void RenderControls()
         {
-            Console.WriteLine("[0] - Main menu\n");
+            Console.WriteLine("[Q] - Main menu\n");
             Console.Write("\nSelect option: ");
         }
 
         protected override Screen HandleInput(string input)
         {
-            switch (input) {
-                case "0":
-                    return new MainMenuScreen(_uow);
+            switch (input.ToUpper()) {
+                case "Q":
+                    return new MainMenuScreen(_uow, null);
                 default:
                     return this;
             }

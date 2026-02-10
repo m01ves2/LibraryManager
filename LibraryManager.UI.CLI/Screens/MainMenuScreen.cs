@@ -6,7 +6,7 @@ namespace LibraryManager.UI.CLI.Screens
     public class MainMenuScreen : Screen
     {
         protected override string Title => "MAIN MENU";
-        public MainMenuScreen(IUnitOfWork uow) : base(uow)
+        public MainMenuScreen(IUnitOfWork uow, Screen? previous = null) : base(uow, previous)
         {
         }
 
@@ -23,14 +23,14 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine("[4] - add author");
             Console.WriteLine("[5] - remove book");
             Console.WriteLine("[6] - remove author");
-            Console.WriteLine("[0] - exit");
+            Console.WriteLine("[Q] - exit");
             
             Console.Write("\nSelect option: ");
         }
 
         protected override Screen? HandleInput(string input)
         {
-            switch (input) {
+            switch (input.ToUpper()) {
                 case "1":
                     return new ListBooksScreen(new ListBooksContext(1, 3), _uow);
                 case "2":
@@ -43,7 +43,7 @@ namespace LibraryManager.UI.CLI.Screens
                     return new RemoveBookScreen(_uow);
                 case "6":
                     return new RemoveAuthorScreen(_uow);
-                case "0":
+                case "Q":
                     return null;
                 default:
                     return this;

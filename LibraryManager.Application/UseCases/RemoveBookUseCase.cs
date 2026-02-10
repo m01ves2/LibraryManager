@@ -19,14 +19,14 @@ namespace LibraryManager.Application.UseCases
             try {
                 Book? book = _uow.Books.GetById(removeBookRequest.Id);
                 if (book is null) {
-                    return new OperationResult<bool>(ResultStatus.NotFound, $"Book {removeBookRequest.Title} not found");
+                    return OperationResult<bool>.NotFound($"Book not found");
                 }
                 _uow.Books.Remove(book);
                 _uow.Commit();
                 return OperationResult<bool>.Ok(true);
             }
             catch (Exception ex) {
-                return OperationResult<bool>.Fail(ex.Message);
+                return OperationResult<bool>.Error(ex.Message);
             }
         }
     }

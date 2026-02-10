@@ -9,7 +9,8 @@ namespace LibraryManager.Application.Results
         public int PageSize { get; }
         public IReadOnlyList<AuthorSummary> Authors { get; }
 
-        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+        //public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+        public int TotalPages => TotalCount / PageSize + (TotalCount % PageSize == 0 ? 0 : 1);
         public bool HasNextPage => PageNumber < TotalPages;
         public bool HasPreviousPage => PageNumber > 1;
 

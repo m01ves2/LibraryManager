@@ -9,17 +9,17 @@ namespace LibraryManager.Domain.Entities
         public string Title { get; private set; }
         public Author Author { get; private set; }
         public string? Description { get; private set; } //необязательное поле, можно менять
-        public Isbn  Isbn { get; private set; }
+        public Isbn?  Isbn { get; private set; }
         
-        public Book(string title, string? description, Author author, Isbn isbn)
+        public Book(string title, string? description, Author author, Isbn? isbn)
         {
             if (string.IsNullOrWhiteSpace(title))
-                throw new InvalidBookException("Title cannot be empty");
+                throw new DomainValidationException("Title cannot be empty");
 
             Title = title;
             Description = description;
             Author = author ?? throw new DomainValidationException("Author cannot be null");
-            Isbn = isbn ?? throw new DomainValidationException("ISBN cannot be null");
+            Isbn = isbn;
         }
 
         public void UpdateBook(Book other)
@@ -33,7 +33,7 @@ namespace LibraryManager.Domain.Entities
         public void UpdateTitle(string newTitle)
         {
             if (string.IsNullOrWhiteSpace(newTitle))
-                throw new InvalidBookException("Book title cannot be empty");
+                throw new DomainValidationException("Book title cannot be empty");
             Title = newTitle;
         }
 

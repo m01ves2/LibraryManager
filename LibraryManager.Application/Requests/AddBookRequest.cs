@@ -4,14 +4,14 @@
     {
         public string Title { get; }
         public string? Description { get; }
-        public string AuthorName { get; }
-        public string Isbn { get; }
+        public int AuthorId { get; }
+        public string? Isbn { get; }
 
-        public AddBookRequest(string title, string description, string authorName, string isbn)
+        public AddBookRequest(string title, string? description, int authorId, string? isbn)
         {
             Title = title;
             Description = description;
-            AuthorName = authorName;
+            AuthorId = authorId;
             Isbn = isbn;
         }
     }

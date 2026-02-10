@@ -15,23 +15,23 @@ namespace LibraryManager.Application.UseCases
             _uow = uow;
         }
 
-        public OperationResult<ListBooksResult> Execute(ListBooksRequest listBooksRequest)//int? id, string? title, Author? author, Isbn? isbn
+        public OperationResult<ListBooksResult> Execute(ListBooksRequest listBooksRequest)//"int? id, string? title, Author? author, Isbn? isbn" filters
         {
             try {
                 int skip = (listBooksRequest.PageNumber - 1) * listBooksRequest.PageSize;
-            int take = listBooksRequest.PageSize;
-            List<Book> books =  _uow.Books.GetPaged(skip, take).ToList();
-            int totalCount = _uow.Books.Count();
+                int take = listBooksRequest.PageSize;
+                List<Book> books = _uow.Books.GetPaged(skip, take).ToList();
+                int totalCount = _uow.Books.Count();
 
-            // Маппинг Entity -> DTO
-            var bookSummaries = books.Select(book => new BookSummary(book.Id, book.Title, book.Author.Name, book.Isbn.Value)).ToList();
+                // Маппинг Entity -> DTO
+                var bookSummaries = books.Select(book => new BookSummary(book.Id, book.Title, book.Author.Name, book.Isbn?.Value)).ToList();
 
-            ListBooksResult data = new ListBooksResult(totalCount, listBooksRequest.PageNumber, listBooksRequest.PageSize, bookSummaries);
-            return OperationResult<ListBooksResult>.Ok(data);
+                ListBooksResult data = new ListBooksResult(totalCount, listBooksRequest.PageNumber, listBooksRequest.PageSize, bookSummaries);
+                return OperationResult<ListBooksResult>.Ok(data);
             }
             catch (Exception ex) {
                 // Любые неожиданные исключения централизованно обрабатываем
-                return OperationResult<ListBooksResult>.Fail(ex.Message);
+                return OperationResult<ListBooksResult>.Error(ex.Message);
             }
         }
     }

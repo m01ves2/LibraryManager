@@ -16,13 +16,18 @@ namespace LibraryManager.UI.CLI.Screens
         private ListBooksResult? _data;
         private string? _error;
 
-        public ListBooksScreen(ListBooksContext context, IUnitOfWork uow) : base(uow)
+        public ListBooksScreen(ListBooksContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
         {
             _context = context;
             _useCase = new ListBooksUseCase(uow);
         }
+
         protected override void LoadData()
         {
+            _status = ResultStatus.Success;
+            _error = null;
+            _data = null;
+
             var request = new ListBooksRequest(_context.PageNumber, _context.PageSize);
             var result = _useCase.Execute(request);
 
@@ -68,35 +73,29 @@ namespace LibraryManager.UI.CLI.Screens
                 Console.WriteLine($"Page: {_data.PageNumber}/{_data.TotalPages}\n");
 
                 if (_data.HasPreviousPage || _data.HasNextPage) {
-                    Console.WriteLine("[1] - previous page");
-                    Console.WriteLine("[2] - next page");
+                    Console.WriteLine("[P] - previous page");
+                    Console.WriteLine("[N] - next page");
                 }
             }
 
-            Console.WriteLine("[0] - Main menu\n");
+            Console.WriteLine("[Q] - Main menu\n");
             Console.Write("\nSelect option: ");
         }
 
         protected override Screen HandleInput(string input)
         {
             if (_data is null) {
-                if (input == "0")
-                    return new MainMenuScreen(_uow);
-                else
                     return this;
             }
 
-            switch (input) {
-                case "1" when _data.HasPreviousPage:
+            switch (input.ToUpper()) {
+                case "P" when _data.HasPreviousPage:
                     var newContextPrev = new ListBooksContext(_data.PageNumber - 1, _context.PageSize);
                     return new ListBooksScreen(newContextPrev, _uow);
-
-
-                case "2" when _data.HasNextPage:
+                case "N" when _data.HasNextPage:
                     var newContextNext = new ListBooksContext(_data.PageNumber + 1, _context.PageSize);
                     return new ListBooksScreen(newContextNext, _uow);
-
-                case "0":
+                case "Q":
                     return new MainMenuScreen(_uow);
                 default:
                     return this;

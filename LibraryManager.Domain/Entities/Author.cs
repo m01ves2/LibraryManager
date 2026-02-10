@@ -22,31 +22,34 @@ namespace LibraryManager.Domain.Entities
             Name = newName;
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(this, obj)) 
-                return true;
-            if (obj is not Author other) 
-                return false;
+        //public override bool Equals(object? obj)
+        //{
+        //    if (ReferenceEquals(this, obj)) 
+        //        return true;
+        //    if (obj is not Author other) 
+        //        return false;
 
-            return Id == other.Id && Name == other.Name;
-        }
+        //    if(Id == 0 || other.Id == 0)
+        //        return false;
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Id, Name);
-        }
+        //    return Id == other.Id;
+        //}
 
-        public static bool operator ==(Author left, Author right)
-        {
-            if (ReferenceEquals(left, null))
-                return ReferenceEquals(right, null);
-            return left.Equals(right);
-        }
+        //public override int GetHashCode()
+        //{
+        //    return HashCode.Combine(Id, Name);
+        //}
 
-        public static bool operator !=(Author left, Author right)
-        {
-            return !(left == right);
-        }
+        //public static bool operator ==(Author left, Author right)
+        //{
+        //    if (ReferenceEquals(left, null))
+        //        return ReferenceEquals(right, null);
+        //    return left.Equals(right);
+        //}
+
+        //public static bool operator !=(Author left, Author right)
+        //{
+        //    return !(left == right);
+        //}
     }
 }

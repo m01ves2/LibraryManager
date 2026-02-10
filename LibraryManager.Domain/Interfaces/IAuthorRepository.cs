@@ -7,9 +7,10 @@ namespace LibraryManager.Domain.Interfaces
         // Authors
         void Add(Author author);
         int Count();
+        public IReadOnlyList<Author> GetAll(string? NameContains = null);
         Author? GetById(int id);
-        Author? GetByName(string name);
-        IReadOnlyList<Author> GetPaged(int skip, int take);
+        public IReadOnlyList<Author> GetByName(string name);
+        IReadOnlyList<Author> GetPaged(int skip, int take, string? nameContains);
         void Remove(Author author);
     }
 }

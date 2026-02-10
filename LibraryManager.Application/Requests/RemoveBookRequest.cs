@@ -3,11 +3,9 @@
     public class RemoveBookRequest
     {
         public int Id { get; }
-        public string? Title { get; } // только для сообщений
-        public RemoveBookRequest(int id, string? title = null)
+        public RemoveBookRequest(int id)
         {
             Id = id;
-            Title = title;
         }
     }
 }

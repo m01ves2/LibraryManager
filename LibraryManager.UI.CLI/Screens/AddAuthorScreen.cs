@@ -9,17 +9,22 @@ namespace LibraryManager.UI.CLI.Screens
     {
         protected override string Title => "ADD AUTHOR";
         private AddAuthorUseCase _useCase;
+
         private AddAuthorResult? _data;
         private string? _error;
         private ResultStatus _status;
 
-        public AddAuthorScreen(IUnitOfWork uow) : base(uow)
+        public AddAuthorScreen(IUnitOfWork uow, Screen? previous) : base(uow, previous)
         {
             _useCase = new AddAuthorUseCase(uow);
         }
 
         protected override void LoadData()
         {
+            _status = ResultStatus.Success;
+            _error = null;
+            _data = null;
+
             Console.Write("Input author's Name: ");
             string name = Console.ReadLine() ?? "";
 
@@ -50,19 +55,20 @@ namespace LibraryManager.UI.CLI.Screens
         }
         protected override void RenderControls()
         {
-            Console.WriteLine("[0] - Main menu\n");
+            Console.WriteLine("[Q] - Main menu\n");
             Console.Write("\nSelect option: ");
         }
 
         protected override Screen HandleInput(string input)
         {
-            if (_data is null) {
-                return new MainMenuScreen(_uow);
-            }
+            if (input == "Q")
+                return _returnTo;
 
-            switch (input) {
-                case "0":
-                    return new MainMenuScreen(_uow);
+            //if (_data is null) {
+            //    return new MainMenuScreen(_uow);
+            //}
+
+            switch (input.ToUpper()) {
                 default:
                     return this;
             }
