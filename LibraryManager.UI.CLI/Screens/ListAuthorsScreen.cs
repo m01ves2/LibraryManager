@@ -78,7 +78,8 @@ namespace LibraryManager.UI.CLI.Screens
                         Console.WriteLine();
                     }
 
-                    Console.WriteLine($"Page: {_data.PageNumber}/{_data.TotalPages}\n");
+                    if(_data.TotalPages > 0)
+                        Console.WriteLine($"Page: {_data.PageNumber}/{_data.TotalPages}\n");
                 }
                 else {
                     Console.WriteLine($"\nERROR: {_error ?? "Unknown error"}\n");

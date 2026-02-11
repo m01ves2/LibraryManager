@@ -16,6 +16,7 @@ namespace LibraryManager.UI.CLI.Screens
         protected override string Title => "BOOKS";
         private ListBooksUseCase _useCase;
         private ListBooksContext _context;
+        private readonly RemoveBookUseCase _removeBookUseCase;
 
         private ListBooksStep _currentStep;
 
@@ -23,10 +24,13 @@ namespace LibraryManager.UI.CLI.Screens
         private ResultStatus _status;
         private string? _error;
 
+        private int _selectedIndex = 0;
+
         public ListBooksScreen(ListBooksContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
         {
             _context = context;
             _useCase = new ListBooksUseCase(uow);
+            _removeBookUseCase = new RemoveBookUseCase(uow);
             _currentStep = ListBooksStep.Confirm;
 
             _error = null;
@@ -38,20 +42,17 @@ namespace LibraryManager.UI.CLI.Screens
             if (_currentStep == ListBooksStep.Done)
                 return;
             else if(_currentStep == ListBooksStep.Confirm) {
-                LoadPage();
+                var request = new ListBooksRequest(_context.PageNumber, _context.PageSize);
+                var result = _useCase.Execute(request);
+                _data = result.Data;
+                _error = result.Message;
+                _status = result.Status;
+
+                _currentStep = ListBooksStep.Done;
+                _selectedIndex = 0;
+                SelectBook(_selectedIndex);
             }
 
-        }
-
-        private void LoadPage()
-        {
-            var request = new ListBooksRequest(_context.PageNumber, _context.PageSize);
-            var result = _useCase.Execute(request);
-            _data = result.Data;
-            _error = result.Message;
-            _status = result.Status;
-
-            _currentStep = ListBooksStep.Done;
         }
 
         protected override void RenderBody()
@@ -76,7 +77,8 @@ namespace LibraryManager.UI.CLI.Screens
                         Console.WriteLine();
                     }
 
-                    Console.WriteLine($"Page: {_data.PageNumber}/{_data.TotalPages}\n");
+                    if(_data.TotalPages > 0)
+                        Console.WriteLine($"Page: {_data.PageNumber}/{_data.TotalPages}\n");
                 }
                 else {
                     Console.WriteLine($"\nERROR: {_error ?? "Unknown error"}\n");
@@ -90,12 +92,15 @@ namespace LibraryManager.UI.CLI.Screens
         private void RenderControls()
         {
             switch (_currentStep) {
+                case ListBooksStep.Confirm:
+                    break;
+
                 case ListBooksStep.Done:
                     if (_data is not null) {
                         if (_data.HasPreviousPage || _data.HasNextPage) {
-                            Console.WriteLine("[P] - previous page");
-                            Console.WriteLine("[N] - next page");
+                            Console.WriteLine("[P] - previous page, [N] - next page");
                         }
+                        Console.WriteLine("[W] - select prev, [S] - select next");
                     }
                     break;
             }
@@ -103,10 +108,9 @@ namespace LibraryManager.UI.CLI.Screens
 
         protected override void RenderPrompt()
         {
-            Console.WriteLine("[1] - Select book");
-            Console.WriteLine("[2] - Add book");
-            Console.WriteLine("[3] - Delete book");
-            Console.WriteLine("[4] - Modify Book");
+            Console.WriteLine("[1] - Add book");
+            Console.WriteLine("[2] - Delete book");
+            Console.WriteLine("[3] - Modify Book");
             Console.WriteLine("[B] - Go back");
             Console.WriteLine("[Q] - Main menu");
 
@@ -128,30 +132,40 @@ namespace LibraryManager.UI.CLI.Screens
                     case "N":
                         if (_data is not null && _data.HasNextPage) {
                             _context.PageNumber++;
-                            LoadPage();
+                            _currentStep = ListBooksStep.Confirm;
+                            LoadData();
                         }
                         break;
                     case "P":
                         if (_data is not null && _data.HasPreviousPage) {
                             _context.PageNumber--;
-                            LoadPage();
+                            _currentStep = ListBooksStep.Confirm;
+                            LoadData();
                         }
                         break;
+                    case "W":
+                        if (_data is not null && _selectedIndex > 0)
+                            SelectBook(--_selectedIndex);
+                        break;
+                    case "S":
+                        if (_data is not null && _data.Books.Count - 1 > _selectedIndex)
+                            SelectBook(++_selectedIndex);
+                        break;
+
                     case "1":
-                        //TODO select record
-                        break;
+                        return new AddBookScreen(new AddBookContext(), _uow, this);
                     case "2":
+                        DeleteBook();
                         break;
-                    case "3":
-                        break;
-                    case "4":
+                    case "3"://TODO Modify book
+                        //return new UpdateBookScreen(new UpdateBookContext(), _uow, this);
                         break;
                 }
             }
             return this;
         }
 
-        private void ResetScreen() //TODO
+        private void ResetScreen()
         {
             _currentStep = ListBooksStep.Confirm;
 
@@ -159,8 +173,45 @@ namespace LibraryManager.UI.CLI.Screens
             _error = null;
             _status = ResultStatus.Success;
 
-            _context = new ListBooksContext();
+            _context.PageNumber = 1;
+            _context.Title = null;
+            _context.Isbn = null;
+            _context.AuthorName = null;
+            _context.Description = null;
         }
+
+        private void SelectBook(int i)
+        {
+            if (_currentStep == ListBooksStep.Done && _data is not null && i < _data.Books.Count && i >= 0) {
+                _context.Id = _data.Books[i].Id;
+                _context.Title = _data.Books[i].Title;
+                _context.Isbn = _data.Books[i].Isbn;
+                _context.AuthorName = _data.Books[i].AuthorName;
+                //_context.Description = _data.Books[i].Description;
+            }
+        }
+
+        private void DeleteBook()
+        {
+            if (_context.Id is not null) {
+                var deleteRequest = new RemoveBookRequest((int)_context.Id);
+                var deleteResult = _removeBookUseCase.Execute(deleteRequest);
+
+                if (deleteResult.Status == ResultStatus.Success) {
+                    Console.WriteLine($"Book {_context.Id} removed");
+                    ResetScreen();
+                }
+                else {
+                    Console.WriteLine(deleteResult.Message);
+                }
+            }
+            else {
+                Console.WriteLine("Select book to delete.");
+            }
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+        }
+
 
         private void PrintSelected(string output)
         {
