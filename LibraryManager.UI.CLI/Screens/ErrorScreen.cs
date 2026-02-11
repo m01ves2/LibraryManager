@@ -17,9 +17,11 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine(_message);
         }
 
-        protected override void RenderControls()
+        protected override void RenderPrompt()
         {
-            Console.WriteLine("[Q] - Main menu\n");
+            Console.WriteLine("[Q] - Exit");
+
+            Console.Write("\nSelect option: ");
         }
 
         protected override Screen HandleInput(string input)

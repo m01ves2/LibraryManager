@@ -15,15 +15,13 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine("Welcome to Library Manager");
         }
 
-        protected override void RenderControls()
+        protected override void RenderPrompt()
         {
-            Console.WriteLine("[1] - list books");
-            Console.WriteLine("[2] - list authors");
-            Console.WriteLine("[3] - add book");
-            Console.WriteLine("[4] - add author");
-            Console.WriteLine("[5] - remove book");
-            Console.WriteLine("[6] - remove author");
-            Console.WriteLine("[Q] - exit");
+            Console.WriteLine("[1] - List books");
+            Console.WriteLine("[2] - List authors");
+            Console.WriteLine("[3] - Add book");
+            Console.WriteLine("[4] - Add author");
+            Console.WriteLine("[Q] - Exit");
             
             Console.Write("\nSelect option: ");
         }
@@ -32,17 +30,17 @@ namespace LibraryManager.UI.CLI.Screens
         {
             switch (input.ToUpper()) {
                 case "1":
-                    return new ListBooksScreen(new ListBooksContext(1, 3), _uow);
+                    return new ListBooksScreen(new ListBooksContext(), _uow, this);
                 case "2":
-                    return new ListAuthorsScreen(new ListAuthorsContext(1,3), _uow);
+                    return new ListAuthorsScreen(new ListAuthorsContext(), _uow, this);
                 case "3":
-                    return new AddBookScreen(_uow);
+                    return new AddBookScreen(new AddBookContext(), _uow, this );
                 case "4":
-                    return new AddAuthorScreen(_uow);
-                case "5":
-                    return new RemoveBookScreen(_uow);
-                case "6":
-                    return new RemoveAuthorScreen(_uow);
+                    return new AddAuthorScreen(new AddAuthorContext(), _uow, this);
+                //case "5":
+                //    return new RemoveBookScreen(_uow);
+                //case "6":
+                //    return new RemoveAuthorScreen(_uow);
                 case "Q":
                     return null;
                 default:

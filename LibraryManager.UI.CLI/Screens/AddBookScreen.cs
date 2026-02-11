@@ -23,7 +23,7 @@ namespace LibraryManager.UI.CLI.Screens
         private AddBookContext _context;
         private ListAuthorsContext _listAuthorsContext;
 
-        AddBookStep _currentStep;
+        private AddBookStep _currentStep;
 
         private AddBookResult? _data;
         private string? _error;
@@ -32,20 +32,24 @@ namespace LibraryManager.UI.CLI.Screens
         public AddBookScreen(AddBookContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
         {
             _useCase = new AddBookUseCase(uow);
+            _listAuthorsContext = new ListAuthorsContext();
             _context = context;
-            _listAuthorsContext = new ListAuthorsContext(1, 10);
+
+            _currentStep = AddBookStep.Title;
+            _data = null;
+            _error = null;
         }
 
-        public override Screen Run() //TODO
+        public override Screen Run()
         {
-            
+
             LoadData();
 
             Console.Clear();
             RenderHeader();
             RenderBreadScrumbs();
             RenderBody();
-            RenderControls();
+            RenderPrompt();
 
             var input = ReadInput();
             return HandleInput(input); // переключает _currentStep
@@ -63,8 +67,9 @@ namespace LibraryManager.UI.CLI.Screens
                 _currentStep = AddBookStep.Description;
             }
             else if (_context.AuthorId == null) {
-                if(_listAuthorsContext.AuthorId != null) { //попытка получить данные из возможно вызванных экранов 
-                    _context.AuthorId = _listAuthorsContext.AuthorId;
+                if (_listAuthorsContext.Id != null) { //попытка получить данные из возможно вызванных экранов 
+                    _context.AuthorId = _listAuthorsContext.Id;
+                    _context.AuthorName = _listAuthorsContext.Name;
                     _currentStep = AddBookStep.ISBN;
                 }
                 else
@@ -93,31 +98,26 @@ namespace LibraryManager.UI.CLI.Screens
             }
 
             Console.WriteLine();
-            RenderPrompt();
         }
 
-        protected override void RenderControls()
-        {
-            Console.WriteLine("[Q] - Main menu\n");
-        }
 
-        private void RenderPrompt()
+        protected override void RenderPrompt()
         {
             switch (_currentStep) {
                 case AddBookStep.Title:
-                    Console.Write("Enter title: ");
+                    Console.Write("Enter title (Q - Main menu): ");
                     break;
 
                 case AddBookStep.Description:
-                    Console.Write("Enter description: ");
+                    Console.Write("Enter description (Q - Main menu): ");
                     break;
 
                 case AddBookStep.Author:
-                    Console.Write("Enter author name: ");
+                    Console.Write("Enter author name (Q - Main menu): ");
                     break;
 
                 case AddBookStep.ISBN:
-                    Console.Write("Enter ISBN: ");
+                    Console.Write("Enter ISBN (Q - Main menu): ");
                     break;
 
                 case AddBookStep.Confirm:
@@ -125,19 +125,27 @@ namespace LibraryManager.UI.CLI.Screens
                     break;
 
                 case AddBookStep.Done:
-                    Console.Write("Press Q to return to Main menu: ");
+                    Console.WriteLine("[B] - Go back");
+                    Console.WriteLine("[Q] - Exit");
+
+                    Console.Write("\nSelect option: ");
                     break;
             }
         }
 
         protected override Screen HandleInput(string input)
         {
-            if (IsExitRequested(input))
+            if (IsExitRequested(input)) {
+                ResetScreen();
                 return new MainMenuScreen(_uow);
+            }
+            if (IsBackRequested(input)) {
+                return _previous ?? new MainMenuScreen(_uow);
+            }
 
             switch (_currentStep) {
                 case AddBookStep.Title:
-                    if (string.IsNullOrWhiteSpace(input)) 
+                    if (string.IsNullOrWhiteSpace(input))
                         return this;
                     _context.Title = input;
                     _currentStep = AddBookStep.Description;
@@ -149,11 +157,11 @@ namespace LibraryManager.UI.CLI.Screens
                     break;
 
                 case AddBookStep.Author:
-                    if(string.IsNullOrWhiteSpace(input))
+                    if (string.IsNullOrWhiteSpace(input))
                         return this;
                     _context.AuthorName = input;
 
-                    _listAuthorsContext.AuthorName = input;
+                    _listAuthorsContext.Name = input;
                     return new ListAuthorsScreen(_listAuthorsContext, _uow, this);
 
                 case AddBookStep.ISBN:
@@ -163,14 +171,9 @@ namespace LibraryManager.UI.CLI.Screens
 
                 case AddBookStep.Confirm:
                     if (input.ToUpper() != "Y" && input.ToUpper() != "YES")
-                        return new MainMenuScreen(_uow);
+                        return _previous ?? new MainMenuScreen(_uow);
 
-                    //// тут подтверждение и вызов UseCase
-                    //if (_context.Title == null || _context.AuthorId == null) { //проверка на всякий случай
-                    //    return new ErrorScreen(_uow, "Title or Author is missing. Can't create a new book", this);
-                    //}
-
-                    var request = new AddBookRequest(_context.Title!, _context.Description, _context.AuthorId!.Value, _context.Isbn); //что делать с -1 ??
+                    var request = new AddBookRequest(_context.Title!, _context.Description, _context.AuthorId!.Value, _context.Isbn);
                     var result = _useCase.Execute(request);
                     _data = result.Data;
                     _error = result.Message;
@@ -179,11 +182,24 @@ namespace LibraryManager.UI.CLI.Screens
                     _currentStep = AddBookStep.Done;
                     break;
 
-                case AddBookStep.Done: //TODO - возвращаться не в MainMenuScreen, а в родительский экран, с очищением контекстов. чтобы массово CRUD книги, прямо из ListBooksScreen
+                case AddBookStep.Done:
                     break;
             }
 
             return this;
         }
+
+        private void ResetScreen()
+        {
+            _currentStep = AddBookStep.Title;
+
+            _data = null;
+            _error = null;
+            _status = ResultStatus.Success;
+
+            _context = new AddBookContext(); //TODO - копирование по значению
+            _listAuthorsContext = new ListAuthorsContext();
+        }
+
     }
 }

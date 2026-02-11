@@ -7,6 +7,10 @@
         public int PageNumber { get; }
         public int PageSize { get; }
 
+        public string? TitleContains { get; set; }
+        public string? AuthorNameContains { get; set; }
+        public string? IsbnContains { get; set; }
+
         public ListBooksRequest(int pageNumber, int pageSize)
         {
             if (pageNumber < 1)

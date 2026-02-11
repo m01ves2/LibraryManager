@@ -23,7 +23,7 @@ namespace LibraryManager.UI.CLI.Screens
             RenderHeader();
             RenderBreadScrumbs();
             RenderBody();
-            RenderControls();
+            RenderPrompt();
 
             var input = ReadInput();
             return HandleInput(input);
@@ -45,8 +45,10 @@ namespace LibraryManager.UI.CLI.Screens
             string breadScrumbs = "";
             while (current != null) {
                 breadScrumbs = current.Title + " > " + breadScrumbs;
-                current = _previous;
+                current = current._previous;
             }
+            Console.WriteLine(breadScrumbs);
+            Console.WriteLine("----------------------------");
         }
         protected abstract void RenderBody();
         protected void RenderError(ResultStatus status, string? error)
@@ -55,7 +57,7 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine("ERROR: " + (error ?? "UNDEFINED ERROR"));
         }
 
-        protected virtual void RenderControls() { }
+        protected virtual void RenderPrompt() { }
         //protected virtual void RenderPrompt(string message) { }
         protected virtual string ReadInput()
         {
@@ -66,6 +68,11 @@ namespace LibraryManager.UI.CLI.Screens
         protected bool IsExitRequested(string input)
         {
             return input.Equals("Q", StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected bool IsBackRequested(string input)
+        {
+            return input.Equals("B", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
