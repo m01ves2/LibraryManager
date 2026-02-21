@@ -36,27 +36,27 @@ namespace LibraryManager.Infrastructure.Repositories.EF.Repositories
 
         public IReadOnlyList<Book> GetByAuthorId(int authorId)
         {
-            return _context.Books.Include(b => b.Author).Where(b => b.AuthorId == authorId).ToList();
+            return _context.Books.Where(b => b.AuthorId == authorId).Include(b => b.Author).ToList();
         }
 
         public Book? GetById(int id)
         {
-            return _context.Books.Include(b => b.Author).FirstOrDefault(b => b.Id == id);
+            return _context.Books.Where(b => b.Id == id).Include(b => b.Author).FirstOrDefault();
         }
 
         public Book? GetByIsbn(Isbn isbn)
         {
-            return _context.Books.Include(b => b.Author).FirstOrDefault(b => b.Isbn != null && b.Isbn.Value == isbn.Value);
+            return _context.Books.Where(b => b.Isbn != null && b.Isbn.Value == isbn.Value).Include(b => b.Author).FirstOrDefault();
         }
 
         public IReadOnlyList<Book> GetPaged(int skip, int take)
         {
-            return _context.Books.Include(b => b.Author).OrderBy(b => b.Id).Skip(skip).Take(take).ToList();
+            return _context.Books.OrderBy(b => b.Id).Skip(skip).Take(take).Include(b => b.Author).ToList();
         }
 
         public IReadOnlyList<Book> GetPagedByAuthorId(int skip, int take, int authorId)
         {
-            return _context.Books.Include(b => b.Author).OrderBy(b => b.Id).Where(b => b.AuthorId == authorId).Skip(skip).Take(take).ToList();
+            return _context.Books.OrderBy(b => b.Id).Where(b => b.AuthorId == authorId).Skip(skip).Take(take).Include(b => b.Author).ToList();
         }
 
         public bool HasBooksByAuthorId(int authorId)
