@@ -4,36 +4,38 @@ using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.ValueObjects;
+using LibraryManager.Infrastructure.Repositories.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManager.Application.UseCases
 {
     public class AddBookUseCase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly LibraryDbContext _context;
 
-        public AddBookUseCase(IUnitOfWork uow)
+        public AddBookUseCase(LibraryDbContext context)
         {
-            _uow = uow;
+            _context = context;
         }
 
         public OperationResult<AddBookResult> Execute(AddBookRequest addBookRequest)
         {
             try {
-                Author? author = _uow.Authors.GetById(addBookRequest.AuthorId);
+                Author? author = _context.Authors.Where(a => a.Id == addBookRequest.AuthorId).Include(a => a.Books).FirstOrDefault();
                 if (author is null)
                     return OperationResult<AddBookResult>.NotFound($"Author not found");
 
                 Isbn? isbn = null;
                 if (addBookRequest.Isbn is not null) {
                     isbn = Isbn.Parse(addBookRequest.Isbn);
-                    Book? bookByIsbn = _uow.Books.GetByIsbn(isbn);
+                    Book? bookByIsbn = _context.Books.Where(b => b.Isbn != null && b.Isbn.Value == isbn.Value).Include(b => b.Author).FirstOrDefault();
                     if (bookByIsbn is not null)
                         return OperationResult<AddBookResult>.Conflict($"Book ISBN:{addBookRequest.Isbn} already exists");
                 }
                 
                 Book book = new Book(addBookRequest.Title, addBookRequest.Description, author, author.Id, isbn);
-                _uow.Books.Add(book);
-                _uow.Commit();
+                _context.Books.Add(book);
+                _context.SaveChanges();
 
                 AddBookResult addBookResult = new AddBookResult(book.Id, book.Title, book.Description, book.Author.Name, book.Isbn?.Value);
                 return OperationResult<AddBookResult>.Ok(addBookResult);
@@ -42,23 +44,6 @@ namespace LibraryManager.Application.UseCases
                 // Любые неожиданные исключения централизованно обрабатываем
                 return OperationResult<AddBookResult>.Error(ex.Message);
             }
-        }
-
-        public OperationResult<IReadOnlyList<AuthorPreview>> GetAuthors(string authorName)
-        {
-            if (string.IsNullOrWhiteSpace(authorName))
-                return OperationResult<IReadOnlyList<AuthorPreview>>.InvalidInput("Author name is empty");
-
-            var authors = _uow.Authors.GetByName(authorName).ToList();
-            if (!authors.Any())
-                return OperationResult<IReadOnlyList<AuthorPreview>>.NotFound($"Author not found");
-
-
-            var authorsBooks = authors.ToDictionary(author => author.Id, author => _uow.Books.GetPagedByAuthorId(0, 3, author.Id).Select(b => b.Title).ToList());
-            var authorsBooksCount = authors.ToDictionary(author => author.Id, author => _uow.Books.CountByAuthorId(author.Id));
-            
-            var result = authors.Select(author => new AuthorPreview(author.Id, author.Name, authorsBooksCount[author.Id], authorsBooks[author.Id])).ToList();
-            return OperationResult<IReadOnlyList<AuthorPreview>>.Ok(result);
         }
     }
 }

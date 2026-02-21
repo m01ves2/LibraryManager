@@ -2,27 +2,29 @@
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManager.Application.UseCases
 {
     public class RemoveBookUseCase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly LibraryDbContext _context;
 
-        public RemoveBookUseCase(IUnitOfWork uow)
+        public RemoveBookUseCase(LibraryDbContext context)
         {
-            _uow = uow;
+            _context = context;
         }
 
         public OperationResult<bool> Execute(RemoveBookRequest removeBookRequest)
         {
             try {
-                Book? book = _uow.Books.GetById(removeBookRequest.Id);
+                Book? book = _context.Books.Where(b => b.Id == removeBookRequest.Id).FirstOrDefault();
                 if (book is null) {
                     return OperationResult<bool>.NotFound($"Book not found");
                 }
-                _uow.Books.Remove(book);
-                _uow.Commit();
+                _context.Books.Remove(book);
+                _context.SaveChanges();
                 return OperationResult<bool>.Ok(true);
             }
             catch (Exception ex) {

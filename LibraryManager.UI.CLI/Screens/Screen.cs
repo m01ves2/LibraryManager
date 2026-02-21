@@ -1,16 +1,17 @@
 ﻿using LibraryManager.Application.Results;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 
 namespace LibraryManager.UI.CLI.Screens
 {
     public abstract class Screen
     {
-        protected readonly IUnitOfWork _uow;
+        protected readonly LibraryDbContext _dbContext;
         protected readonly Screen? _previous;
         protected abstract string Title { get; }
-        public Screen(IUnitOfWork uow, Screen? previous = null) 
+        public Screen(LibraryDbContext dbContext, Screen? previous = null) 
         {
-            _uow = uow;
+            _dbContext = dbContext;
             _previous = previous;
         }
         

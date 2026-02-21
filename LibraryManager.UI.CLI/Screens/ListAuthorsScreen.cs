@@ -2,6 +2,7 @@
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -27,11 +28,11 @@ namespace LibraryManager.UI.CLI.Screens
 
         private int _selectedIndex = 0;
 
-        public ListAuthorsScreen(ListAuthorsContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public ListAuthorsScreen(ListAuthorsContext context, LibraryDbContext dbContext, Screen? previous) : base(dbContext, previous)
         {
             _context = context;
-            _useCase = new ListAuthorsUseCase(uow);
-            _removeAuthorUseCase = new RemoveAuthorUseCase(uow);
+            _useCase = new ListAuthorsUseCase(dbContext);
+            _removeAuthorUseCase = new RemoveAuthorUseCase(dbContext);
             _currentStep = ListAuthorsStep.Confirm;
 
             _error = null;
@@ -122,10 +123,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return new MainMenuScreen(_dbContext);
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? new MainMenuScreen(_dbContext);
             }
 
             if (_currentStep == ListAuthorsStep.Done) {
@@ -153,7 +154,7 @@ namespace LibraryManager.UI.CLI.Screens
                             SelectAuthor(++_selectedIndex);
                         break;
                     case "1":   //Add author
-                        return new AddAuthorScreen(new AddAuthorContext(), _uow, this);
+                        return new AddAuthorScreen(new AddAuthorContext(), _dbContext, this);
                     case "2":   //Delete author
                         DeleteAuthor();
                         break;

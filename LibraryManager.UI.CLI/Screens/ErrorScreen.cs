@@ -1,11 +1,12 @@
 ﻿using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 
 namespace LibraryManager.UI.CLI.Screens
 {
     public class ErrorScreen : Screen
     {
         private string _message;
-        public ErrorScreen(IUnitOfWork uow, string message, Screen? previous = null) : base(uow, previous)
+        public ErrorScreen(LibraryDbContext dbContext, string message, Screen? previous = null) : base(dbContext, previous)
         {
             _message = message;
         }
@@ -27,7 +28,7 @@ namespace LibraryManager.UI.CLI.Screens
         protected override Screen HandleInput(string input)
         {
             if (IsExitRequested(input))
-                return new MainMenuScreen(_uow);
+                return new MainMenuScreen(_dbContext);
 
             switch (input) {
                 default: 

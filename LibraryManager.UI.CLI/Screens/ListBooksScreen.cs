@@ -2,6 +2,7 @@
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -26,11 +27,11 @@ namespace LibraryManager.UI.CLI.Screens
 
         private int _selectedIndex = 0;
 
-        public ListBooksScreen(ListBooksContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public ListBooksScreen(ListBooksContext context, LibraryDbContext dbContext, Screen? previous) : base(dbContext, previous)
         {
             _context = context;
-            _useCase = new ListBooksUseCase(uow);
-            _removeBookUseCase = new RemoveBookUseCase(uow);
+            _useCase = new ListBooksUseCase(dbContext);
+            _removeBookUseCase = new RemoveBookUseCase(dbContext);
             _currentStep = ListBooksStep.Confirm;
 
             _error = null;
@@ -121,10 +122,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return new MainMenuScreen(_dbContext);
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? new MainMenuScreen(_dbContext);
             }
 
             if (_currentStep == ListBooksStep.Done) {
@@ -153,7 +154,7 @@ namespace LibraryManager.UI.CLI.Screens
                         break;
 
                     case "1":
-                        return new AddBookScreen(new AddBookContext(), _uow, this);
+                        return new AddBookScreen(new AddBookContext(), _dbContext, this);
                     case "2":
                         DeleteBook();
                         break;

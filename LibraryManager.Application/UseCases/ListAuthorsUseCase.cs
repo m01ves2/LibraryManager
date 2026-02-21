@@ -3,16 +3,18 @@ using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManager.Application.UseCases
 {
     public class ListAuthorsUseCase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly LibraryDbContext _context;
 
-        public ListAuthorsUseCase(IUnitOfWork uow)
+        public ListAuthorsUseCase(LibraryDbContext context)
         {
-            _uow = uow;
+            _context = context;
         }
 
         public OperationResult<ListAuthorsResult> Execute(ListAuthorsRequest listAuthorsRequest)//"string? Name" filter
@@ -20,8 +22,8 @@ namespace LibraryManager.Application.UseCases
             try {
                 int skip = (listAuthorsRequest.PageNumber - 1) * listAuthorsRequest.PageSize;
                 int take = listAuthorsRequest.PageSize;
-                var authors = _uow.Authors.GetPaged(skip, take, listAuthorsRequest.NameContains);
-                int totalCount = _uow.Authors.Count(listAuthorsRequest.NameContains);
+                var authors = _context.Authors.OrderBy(a => a.Id).Skip(skip).Take(take).Include(a => a.Books).ToList();
+                int totalCount = _context.Authors.Count();
 
                 var authorPreviews = authors.Select(a => new AuthorPreview(a.Id, a.Name, a.Books.Count, a.Books.Select(b => b.Title).Take(3).ToList())).ToList();
 

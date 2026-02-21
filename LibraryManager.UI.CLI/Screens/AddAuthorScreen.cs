@@ -2,6 +2,7 @@
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -25,9 +26,9 @@ namespace LibraryManager.UI.CLI.Screens
         private string? _error;
         private ResultStatus _status;
 
-        public AddAuthorScreen(AddAuthorContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public AddAuthorScreen(AddAuthorContext context, LibraryDbContext dbContext, Screen? previous) : base(dbContext, previous)
         {
-            _useCase = new AddAuthorUseCase(uow);
+            _useCase = new AddAuthorUseCase(dbContext);
             _context = context;
         }
 
@@ -85,10 +86,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return new MainMenuScreen(_dbContext);
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? new MainMenuScreen(_dbContext);
             }
 
             switch (_currentStep) {
@@ -101,7 +102,7 @@ namespace LibraryManager.UI.CLI.Screens
 
                 case AddAuthorStep.Confirm:
                     if (input.ToUpper() != "Y" && input.ToUpper() != "YES")
-                        return _previous ?? new MainMenuScreen(_uow);
+                        return _previous ?? new MainMenuScreen(_dbContext);
 
                     var request = new AddAuthorRequest(_context.Name!);
                     var result = _useCase.Execute(request);

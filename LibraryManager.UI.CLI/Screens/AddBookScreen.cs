@@ -2,6 +2,7 @@
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -29,9 +30,9 @@ namespace LibraryManager.UI.CLI.Screens
         private string? _error;
         private ResultStatus _status;
 
-        public AddBookScreen(AddBookContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public AddBookScreen(AddBookContext context, LibraryDbContext dbContext, Screen? previous) : base(dbContext, previous)
         {
-            _useCase = new AddBookUseCase(uow);
+            _useCase = new AddBookUseCase(dbContext);
             _listAuthorsContext = new ListAuthorsContext();
             _context = context;
 
@@ -137,10 +138,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return new MainMenuScreen(_dbContext);
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? new MainMenuScreen(_dbContext);
             }
 
             switch (_currentStep) {
@@ -162,7 +163,7 @@ namespace LibraryManager.UI.CLI.Screens
                     _context.AuthorName = input;
 
                     _listAuthorsContext.Name = input;
-                    return new ListAuthorsScreen(_listAuthorsContext, _uow, this);
+                    return new ListAuthorsScreen(_listAuthorsContext, _dbContext, this);
 
                 case AddBookStep.ISBN:
                     _context.Isbn = string.IsNullOrWhiteSpace(input) ? null : input;
@@ -171,7 +172,7 @@ namespace LibraryManager.UI.CLI.Screens
 
                 case AddBookStep.Confirm:
                     if (input.ToUpper() != "Y" && input.ToUpper() != "YES")
-                        return _previous ?? new MainMenuScreen(_uow);
+                        return _previous ?? new MainMenuScreen(_dbContext);
 
                     var request = new AddBookRequest(_context.Title!, _context.Description, _context.AuthorId!.Value, _context.Isbn);
                     var result = _useCase.Execute(request);
