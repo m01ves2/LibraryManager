@@ -2,7 +2,7 @@
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.ValueObjects;
 
-namespace LibraryManager.Infrastructure.Repositories
+namespace LibraryManager.Infrastructure.Repositories.InMemory.Repositories
 {
     public class InMemoryBookRepository : IBookRepository
     {

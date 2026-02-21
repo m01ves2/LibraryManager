@@ -1,6 +1,7 @@
 ﻿using LibraryManager.Domain.Interfaces;
+using LibraryManager.Infrastructure.Repositories.InMemory.Repositories;
 
-namespace LibraryManager.Infrastructure.Repositories
+namespace LibraryManager.Infrastructure.Repositories.InMemory
 {
     public class InMemoryUnitOfWork : IUnitOfWork
     {

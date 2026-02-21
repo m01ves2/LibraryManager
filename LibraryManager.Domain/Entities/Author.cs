@@ -6,6 +6,8 @@ namespace LibraryManager.Domain.Entities
     {
         public int Id { get; internal set; } //technical id for DB
         public string Name { get; private set; }
+        public List<Book> Books { get; private set; } = new();
+        protected Author() { }
 
         public Author(string name) 
         {

@@ -24,7 +24,7 @@ namespace LibraryManager.Application.UseCases
                 int totalCount = _uow.Books.Count();
 
                 // Маппинг Entity -> DTO
-                var bookSummaries = books.Select(book => new BookSummary(book.Id, book.Title, book.Author.Name, book.Isbn?.Value)).ToList();
+                var bookSummaries = books.Select(book => new BookPreview(book.Id, book.Title, book.Author.Name, book.Isbn?.Value)).ToList();
 
                 ListBooksResult data = new ListBooksResult(totalCount, listBooksRequest.PageNumber, listBooksRequest.PageSize, bookSummaries);
                 return OperationResult<ListBooksResult>.Ok(data);

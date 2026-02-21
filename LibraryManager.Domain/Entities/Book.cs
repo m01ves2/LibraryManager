@@ -8,10 +8,13 @@ namespace LibraryManager.Domain.Entities
         public int Id { get; internal set; } // технический идентификатор, не для бизнес-логики
         public string Title { get; private set; }
         public Author Author { get; private set; }
+        public int AuthorId { get; private set; }
         public string? Description { get; private set; } //необязательное поле, можно менять
-        public Isbn?  Isbn { get; private set; }
-        
-        public Book(string title, string? description, Author author, Isbn? isbn)
+        public Isbn?  Isbn { get; init; } //immutable
+
+        protected Book() { }
+
+        public Book(string title, string? description, Author author, int authorId, Isbn? isbn)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new DomainValidationException("Title cannot be empty");
@@ -20,13 +23,13 @@ namespace LibraryManager.Domain.Entities
             Description = description;
             Author = author ?? throw new DomainValidationException("Author cannot be null");
             Isbn = isbn;
+            AuthorId = authorId;
         }
 
         public void UpdateBook(Book other)
         {
             UpdateTitle(other.Title);
             UpdateDescription(other.Description);
-            UpdateIsbn(other.Isbn);
             UpdateAuthor(other.Author);
         }
 
@@ -42,10 +45,6 @@ namespace LibraryManager.Domain.Entities
             Description = newDescription; // допускаем пустое описание
         }
 
-        public void UpdateIsbn(Isbn newIsbn)
-        {
-            Isbn = newIsbn ?? throw new DomainValidationException("ISBN cannot be null");
-        }
         public void UpdateAuthor(Author newAuthor)
         {
             Author = newAuthor ?? throw new DomainValidationException("Author cannot be null");

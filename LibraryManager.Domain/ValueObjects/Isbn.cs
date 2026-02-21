@@ -5,7 +5,7 @@ namespace LibraryManager.Domain.ValueObjects
 {
     public sealed class Isbn
     {
-        public string Value { get; }
+        public string Value { get; init; }
 
         private Isbn(string value)
         {
@@ -23,14 +23,18 @@ namespace LibraryManager.Domain.ValueObjects
             return false;
         }
 
-        public static bool operator==(Isbn left, Isbn right)
+        public static bool operator==(Isbn? left, Isbn? right)
         {
-            if (ReferenceEquals(left, null))
-                return ReferenceEquals(right, null);
+            if (ReferenceEquals(left, right))
+                return true;
+
+            if (left is null || right is null)
+                return false;
+
             return left.Equals(right);
         }
 
-        public static bool operator!=(Isbn left, Isbn right)
+        public static bool operator!=(Isbn? left, Isbn? right)
         { 
             return !(left==right); 
         }

@@ -4,7 +4,6 @@ using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.ValueObjects;
-using System.Linq;
 
 namespace LibraryManager.Application.UseCases
 {
@@ -32,7 +31,7 @@ namespace LibraryManager.Application.UseCases
                         return OperationResult<AddBookResult>.Conflict($"Book ISBN:{addBookRequest.Isbn} already exists");
                 }
                 
-                Book book = new Book(addBookRequest.Title, addBookRequest.Description, author, isbn);
+                Book book = new Book(addBookRequest.Title, addBookRequest.Description, author, author.Id, isbn);
                 _uow.Books.Add(book);
                 _uow.Commit();
 
@@ -45,21 +44,21 @@ namespace LibraryManager.Application.UseCases
             }
         }
 
-        public OperationResult<IReadOnlyList<AuthorSummary>> GetAuthors(string authorName)
+        public OperationResult<IReadOnlyList<AuthorPreview>> GetAuthors(string authorName)
         {
             if (string.IsNullOrWhiteSpace(authorName))
-                return OperationResult<IReadOnlyList<AuthorSummary>>.InvalidInput("Author name is empty");
+                return OperationResult<IReadOnlyList<AuthorPreview>>.InvalidInput("Author name is empty");
 
             var authors = _uow.Authors.GetByName(authorName).ToList();
             if (!authors.Any())
-                return OperationResult<IReadOnlyList<AuthorSummary>>.NotFound($"Author not found");
+                return OperationResult<IReadOnlyList<AuthorPreview>>.NotFound($"Author not found");
 
 
             var authorsBooks = authors.ToDictionary(author => author.Id, author => _uow.Books.GetPagedByAuthorId(0, 3, author.Id).Select(b => b.Title).ToList());
             var authorsBooksCount = authors.ToDictionary(author => author.Id, author => _uow.Books.CountByAuthorId(author.Id));
             
-            var result = authors.Select(author => new AuthorSummary(author.Id, author.Name, authorsBooksCount[author.Id], authorsBooks[author.Id])).ToList();
-            return OperationResult<IReadOnlyList<AuthorSummary>>.Ok(result);
+            var result = authors.Select(author => new AuthorPreview(author.Id, author.Name, authorsBooksCount[author.Id], authorsBooks[author.Id])).ToList();
+            return OperationResult<IReadOnlyList<AuthorPreview>>.Ok(result);
         }
     }
 }

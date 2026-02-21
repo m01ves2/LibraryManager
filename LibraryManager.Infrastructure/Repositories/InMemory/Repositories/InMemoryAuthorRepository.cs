@@ -1,8 +1,7 @@
 ﻿using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
-using System.Collections.Generic;
 
-namespace LibraryManager.Infrastructure.Repositories
+namespace LibraryManager.Infrastructure.Repositories.InMemory.Repositories
 {
     public class InMemoryAuthorRepository : IAuthorRepository
     {
@@ -15,11 +14,11 @@ namespace LibraryManager.Infrastructure.Repositories
             _authors.Add(author);
         }
 
-        public IReadOnlyList<Author> GetAll(string? NameContains = null)
+        public IReadOnlyList<Author> GetAll(string? nameContains = null)
         {
             IReadOnlyList<Author> getFiltered = _authors;
-            if(!string.IsNullOrEmpty(NameContains))
-                getFiltered = _authors.Where(a => a.Name.Contains(NameContains)).ToList();
+            if(!string.IsNullOrEmpty(nameContains))
+                getFiltered = _authors.Where(a => a.Name.Contains(nameContains)).ToList();
             return getFiltered;
         }
         public IReadOnlyList<Author> GetPaged(int skip, int take, string? NameContains = null)
@@ -49,9 +48,12 @@ namespace LibraryManager.Infrastructure.Repositories
                 throw new InvalidOperationException("Author to delete not found");
         }
 
-        public int Count()
+        public int Count(string? nameContains = null)
         {
-            return _authors.Count;
+            IReadOnlyList<Author> getFiltered = _authors;
+            if (!string.IsNullOrEmpty(nameContains))
+                getFiltered = _authors.Where(a => a.Name.Contains(nameContains)).ToList();
+            return getFiltered.Count;
         }
     }
 }
