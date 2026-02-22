@@ -1,7 +1,6 @@
 ﻿using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -19,9 +18,10 @@ namespace LibraryManager.UI.CLI.Screens
     public class AddBookScreen : Screen
     {
         protected override string Title => "ADD BOOK";
-        private AddBookUseCase _useCase;
         private AddBookContext _context;
         private ListAuthorsContext _listAuthorsContext;
+
+        private readonly AddBookUseCase _useCase;
 
         private AddBookStep _currentStep;
 
@@ -29,11 +29,11 @@ namespace LibraryManager.UI.CLI.Screens
         private string? _error;
         private ResultStatus _status;
 
-        public AddBookScreen(AddBookContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public AddBookScreen(AddBookContext context, AddBookUseCase useCase, ScreenFactory factory, Screen? previous) : base( factory, previous)
         {
-            _useCase = new AddBookUseCase(uow);
-            _listAuthorsContext = new ListAuthorsContext();
+            _useCase = useCase;
             _context = context;
+            _listAuthorsContext = new ListAuthorsContext();
 
             _currentStep = AddBookStep.Title;
             _data = null;
@@ -137,10 +137,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return GetMainMenuScreen();
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? GetMainMenuScreen();
             }
 
             switch (_currentStep) {
@@ -162,7 +162,7 @@ namespace LibraryManager.UI.CLI.Screens
                     _context.AuthorName = input;
 
                     _listAuthorsContext.Name = input;
-                    return new ListAuthorsScreen(_listAuthorsContext, _uow, this);
+                    return _factory.CreateListAuthorsScreen(_listAuthorsContext, this);
 
                 case AddBookStep.ISBN:
                     _context.Isbn = string.IsNullOrWhiteSpace(input) ? null : input;
@@ -171,7 +171,7 @@ namespace LibraryManager.UI.CLI.Screens
 
                 case AddBookStep.Confirm:
                     if (input.ToUpper() != "Y" && input.ToUpper() != "YES")
-                        return _previous ?? new MainMenuScreen(_uow);
+                        return _previous ?? GetMainMenuScreen();
 
                     var request = new AddBookRequest(_context.Title!, _context.Description, _context.AuthorId!.Value, _context.Isbn);
                     var result = _useCase.Execute(request);

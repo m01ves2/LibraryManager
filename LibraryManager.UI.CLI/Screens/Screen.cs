@@ -5,12 +5,13 @@ namespace LibraryManager.UI.CLI.Screens
 {
     public abstract class Screen
     {
-        protected readonly IUnitOfWork _uow;
         protected readonly Screen? _previous;
+        protected readonly ScreenFactory _factory;
         protected abstract string Title { get; }
-        public Screen(IUnitOfWork uow, Screen? previous = null) 
+
+        public Screen(ScreenFactory factory, Screen? previous = null) 
         {
-            _uow = uow;
+            _factory = factory;
             _previous = previous;
         }
         
@@ -49,6 +50,16 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine(breadScrumbs);
             Console.WriteLine("----------------------------");
         }
+
+        protected virtual Screen GetMainMenuScreen()
+        {
+            Screen current = this;
+            while(current._previous != null) {
+                current = current._previous;
+            }
+            return current;
+        }
+
         protected abstract void RenderBody();
         protected void RenderError(ResultStatus status, string? error)
         {
@@ -57,7 +68,6 @@ namespace LibraryManager.UI.CLI.Screens
         }
 
         protected virtual void RenderPrompt() { }
-        //protected virtual void RenderPrompt(string message) { }
         protected virtual string ReadInput()
         {
             return Console.ReadLine() ?? string.Empty;

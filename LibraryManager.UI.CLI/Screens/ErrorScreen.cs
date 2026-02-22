@@ -5,7 +5,7 @@ namespace LibraryManager.UI.CLI.Screens
     public class ErrorScreen : Screen
     {
         private string _message;
-        public ErrorScreen(IUnitOfWork uow, string message, Screen? previous = null) : base(uow, previous)
+        public ErrorScreen(string message, ScreenFactory factory, Screen? previous = null) : base(factory, previous)
         {
             _message = message;
         }
@@ -27,7 +27,7 @@ namespace LibraryManager.UI.CLI.Screens
         protected override Screen HandleInput(string input)
         {
             if (IsExitRequested(input))
-                return new MainMenuScreen(_uow);
+                return GetMainMenuScreen();
 
             switch (input) {
                 default: 

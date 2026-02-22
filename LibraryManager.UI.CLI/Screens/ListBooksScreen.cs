@@ -1,7 +1,6 @@
 ﻿using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -14,9 +13,11 @@ namespace LibraryManager.UI.CLI.Screens
     public class ListBooksScreen : Screen
     {
         protected override string Title => "BOOKS";
-        private ListBooksUseCase _useCase;
-        private ListBooksContext _context;
+        private readonly ListBooksUseCase _useCase;
+        private readonly ListBooksContext _context;
+
         private readonly RemoveBookUseCase _removeBookUseCase;
+
 
         private ListBooksStep _currentStep;
 
@@ -26,11 +27,15 @@ namespace LibraryManager.UI.CLI.Screens
 
         private int _selectedIndex = 0;
 
-        public ListBooksScreen(ListBooksContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public ListBooksScreen( ListBooksContext context, 
+                                ListBooksUseCase useCase,
+                                RemoveBookUseCase removeBookUseCase,
+                                ScreenFactory factory,
+                                Screen? previous) : base(factory, previous)
         {
             _context = context;
-            _useCase = new ListBooksUseCase(uow);
-            _removeBookUseCase = new RemoveBookUseCase(uow);
+            _useCase = useCase;
+            _removeBookUseCase = removeBookUseCase;
             _currentStep = ListBooksStep.Confirm;
 
             _error = null;
@@ -121,10 +126,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return GetMainMenuScreen();
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? GetMainMenuScreen();
             }
 
             if (_currentStep == ListBooksStep.Done) {
@@ -153,12 +158,12 @@ namespace LibraryManager.UI.CLI.Screens
                         break;
 
                     case "1":
-                        return new AddBookScreen(new AddBookContext(), _uow, this);
+                        return _factory.CreateAddBookScreen(new AddBookContext(), this);
                     case "2":
                         DeleteBook();
                         break;
                     case "3"://TODO Modify book
-                        //return new UpdateBookScreen(new UpdateBookContext(), _uow, this);
+                        //return new UpdateBookScreen(new UpdateBookContext(), _updateBookUseCase, this);
                         break;
                 }
             }

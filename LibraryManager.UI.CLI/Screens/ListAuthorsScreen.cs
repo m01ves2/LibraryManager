@@ -1,7 +1,6 @@
 ﻿using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Application.UseCases;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -15,8 +14,9 @@ namespace LibraryManager.UI.CLI.Screens
     public class ListAuthorsScreen : Screen
     {
         protected override string Title => "AUTHORS";
-        private ListAuthorsUseCase _useCase;
-        private ListAuthorsContext _context;
+        private readonly ListAuthorsUseCase _useCase;
+        private readonly ListAuthorsContext _context;
+
         private readonly RemoveAuthorUseCase _removeAuthorUseCase;
 
         private ListAuthorsStep _currentStep;
@@ -27,11 +27,16 @@ namespace LibraryManager.UI.CLI.Screens
 
         private int _selectedIndex = 0;
 
-        public ListAuthorsScreen(ListAuthorsContext context, IUnitOfWork uow, Screen? previous) : base(uow, previous)
+        public ListAuthorsScreen(   ListAuthorsContext context, 
+                                    ListAuthorsUseCase useCase, 
+                                    RemoveAuthorUseCase removeAuthorUseCase,
+                                    ScreenFactory factory, Screen? previous) : base(factory, previous)
         {
             _context = context;
-            _useCase = new ListAuthorsUseCase(uow);
-            _removeAuthorUseCase = new RemoveAuthorUseCase(uow);
+            _useCase = useCase;
+
+            _removeAuthorUseCase = removeAuthorUseCase;
+
             _currentStep = ListAuthorsStep.Confirm;
 
             _error = null;
@@ -122,10 +127,10 @@ namespace LibraryManager.UI.CLI.Screens
         {
             if (IsExitRequested(input)) {
                 ResetScreen();
-                return new MainMenuScreen(_uow);
+                return GetMainMenuScreen();
             }
             if (IsBackRequested(input)) {
-                return _previous ?? new MainMenuScreen(_uow);
+                return _previous ?? GetMainMenuScreen();
             }
 
             if (_currentStep == ListAuthorsStep.Done) {
@@ -153,12 +158,12 @@ namespace LibraryManager.UI.CLI.Screens
                             SelectAuthor(++_selectedIndex);
                         break;
                     case "1":   //Add author
-                        return new AddAuthorScreen(new AddAuthorContext(), _uow, this);
+                        return _factory.CreateAddAuthorScreen(new AddAuthorContext(), this);
                     case "2":   //Delete author
                         DeleteAuthor();
                         break;
                     case "3":   //TODO Modify author
-                        //return new UpdateAuthorScreen(new UpdateAuthorContext(), _uow, this);
+                        //return new UpdateAuthorScreen(new UpdateAuthorContext(), _updateAuthorUseCase, this);
                         break;
                 }
             }

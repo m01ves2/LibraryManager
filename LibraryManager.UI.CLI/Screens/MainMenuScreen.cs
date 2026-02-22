@@ -1,4 +1,5 @@
-﻿using LibraryManager.Domain.Interfaces;
+﻿using LibraryManager.Application.UseCases;
+using LibraryManager.Domain.Interfaces;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
@@ -6,7 +7,7 @@ namespace LibraryManager.UI.CLI.Screens
     public class MainMenuScreen : Screen
     {
         protected override string Title => "MAIN MENU";
-        public MainMenuScreen(IUnitOfWork uow, Screen? previous = null) : base(uow, previous)
+        public MainMenuScreen(ScreenFactory factory, Screen? previous = null) : base(factory, previous)
         {
         }
 
@@ -30,17 +31,14 @@ namespace LibraryManager.UI.CLI.Screens
         {
             switch (input.ToUpper()) {
                 case "1":
-                    return new ListBooksScreen(new ListBooksContext(), _uow, this);
+                    return _factory.CreateListBooksScreen(new ListBooksContext(), this);
                 case "2":
-                    return new ListAuthorsScreen(new ListAuthorsContext(), _uow, this);
+                    return _factory.CreateListAuthorsScreen(new ListAuthorsContext(), this);
                 case "3":
-                    return new AddBookScreen(new AddBookContext(), _uow, this );
+                    return _factory.CreateAddBookScreen(new AddBookContext(), this );
                 case "4":
-                    return new AddAuthorScreen(new AddAuthorContext(), _uow, this);
-                //case "5":
-                //    return new RemoveBookScreen(_uow);
-                //case "6":
-                //    return new RemoveAuthorScreen(_uow);
+                    return _factory.CreateAddAuthorScreen(new AddAuthorContext(), this);
+
                 case "Q":
                     return null;
                 default:

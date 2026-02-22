@@ -36,7 +36,9 @@ namespace LibraryManager.UI.CLI
             AddMockData(uow);
 
 
-            Screen? currentScreen = new MainMenuScreen(uow);
+            ScreenFactory factory = new ScreenFactory(addAuthorUseCase, addBookUseCase, listAuthorsUseCase, listBooksUseCase, removeAuthorUseCase, removeBookUseCase);
+
+            Screen? currentScreen = new MainMenuScreen(factory, null);
             while(currentScreen != null) {
                 currentScreen = currentScreen.Run();
             }
