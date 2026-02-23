@@ -1,5 +1,4 @@
 ﻿using LibraryManager.Application.Results;
-using LibraryManager.Domain.Interfaces;
 
 namespace LibraryManager.UI.CLI.Screens
 {

@@ -1,28 +1,29 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Repositories;
+using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 
 namespace LibraryManager.Application.UseCases
 {
     public class RemoveBookUseCase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IRepository<Book> _efBookRepository;
+        private readonly IRepository<Author> _efAuthorRepository;
 
-        public RemoveBookUseCase(IUnitOfWork uow)
+        public RemoveBookUseCase(IRepository<Book> efBookRepository, IRepository<Author> efAuthorRepository)
         {
-            _uow = uow;
+            _efBookRepository = efBookRepository;
+            _efAuthorRepository = efAuthorRepository;
         }
 
         public OperationResult<bool> Execute(RemoveBookRequest removeBookRequest)
         {
             try {
-                Book? book = _uow.Books.GetById(removeBookRequest.Id);
+                Book? book = _efBookRepository.GetById(removeBookRequest.Id);
                 if (book is null) {
                     return OperationResult<bool>.NotFound($"Book not found");
                 }
-                _uow.Books.Remove(book);
-                _uow.Commit();
+                _efBookRepository.Remove(book);
                 return OperationResult<bool>.Ok(true);
             }
             catch (Exception ex) {

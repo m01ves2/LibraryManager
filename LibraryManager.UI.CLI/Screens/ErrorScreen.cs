@@ -1,6 +1,4 @@
-﻿using LibraryManager.Domain.Interfaces;
-
-namespace LibraryManager.UI.CLI.Screens
+﻿namespace LibraryManager.UI.CLI.Screens
 {
     public class ErrorScreen : Screen
     {

@@ -1,18 +1,18 @@
-﻿using LibraryManager.Application.Models;
+﻿using LibraryManager.Application.Queries;
 using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
-using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 
 namespace LibraryManager.Application.UseCases
 {
     public class ListBooksUseCase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IGetBooksPagedQuery _getBooksPagedQuery;
+        private readonly IGetBooksCountQuery _countQuery;
 
-        public ListBooksUseCase(IUnitOfWork uow)
+        public ListBooksUseCase(IGetBooksPagedQuery getBooksQuery, IGetBooksCountQuery countQuery)
         {
-            _uow = uow;
+            _getBooksPagedQuery = getBooksQuery;
+            _countQuery = countQuery;
         }
 
         public OperationResult<ListBooksResult> Execute(ListBooksRequest listBooksRequest)//"int? id, string? title, Author? author, Isbn? isbn" filters
@@ -20,11 +20,9 @@ namespace LibraryManager.Application.UseCases
             try {
                 int skip = (listBooksRequest.PageNumber - 1) * listBooksRequest.PageSize;
                 int take = listBooksRequest.PageSize;
-                List<Book> books = _uow.Books.GetPaged(skip, take).ToList();
-                int totalCount = _uow.Books.Count();
 
-                // Маппинг Entity -> DTO
-                var bookSummaries = books.Select(book => new BookPreview(book.Id, book.Title, book.Author.Name, book.Isbn?.Value)).ToList();
+                var bookSummaries = _getBooksPagedQuery.Execute(skip, take); //уже внутри маппинг - проекция
+                int totalCount = _countQuery.Execute();
 
                 ListBooksResult data = new ListBooksResult(totalCount, listBooksRequest.PageNumber, listBooksRequest.PageSize, bookSummaries);
                 return OperationResult<ListBooksResult>.Ok(data);
