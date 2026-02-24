@@ -43,22 +43,5 @@ namespace LibraryManager.Application.UseCases
                 return OperationResult<AddBookResult>.Error(ex.Message);
             }
         }
-
-        public OperationResult<IReadOnlyList<AuthorPreview>> GetAuthors(string authorName)
-        {
-            if (string.IsNullOrWhiteSpace(authorName))
-                return OperationResult<IReadOnlyList<AuthorPreview>>.InvalidInput("Author name is empty");
-
-            var authors = _uow.Authors.GetByName(authorName).ToList();
-            if (!authors.Any())
-                return OperationResult<IReadOnlyList<AuthorPreview>>.NotFound($"Author not found");
-
-
-            var authorsBooks = authors.ToDictionary(author => author.Id, author => _uow.Books.GetPagedByAuthorId(0, 3, author.Id).Select(b => b.Title).ToList());
-            var authorsBooksCount = authors.ToDictionary(author => author.Id, author => _uow.Books.CountByAuthorId(author.Id));
-            
-            var result = authors.Select(author => new AuthorPreview(author.Id, author.Name, authorsBooksCount[author.Id], authorsBooks[author.Id])).ToList();
-            return OperationResult<IReadOnlyList<AuthorPreview>>.Ok(result);
-        }
     }
 }
