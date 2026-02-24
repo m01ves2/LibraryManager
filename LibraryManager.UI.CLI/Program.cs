@@ -1,6 +1,11 @@
-﻿using LibraryManager.Application.UseCases;
+﻿using LibraryManager.Application.Commands.AddAuthor;
+using LibraryManager.Application.Commands.AddBook;
+using LibraryManager.Application.Commands.Interfaces;
+using LibraryManager.Application.Commands.RemoveAuthor;
+using LibraryManager.Application.Commands.RemoveBook;
+using LibraryManager.Application.Queries.ListAuthors;
+using LibraryManager.Application.Queries.ListBooks;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.Infrastructure.Repositories.EF.Repositories;
 using LibraryManager.UI.CLI.Screens;
@@ -22,12 +27,16 @@ namespace LibraryManager.UI.CLI
             libraryDbContext.Database.EnsureCreated();
 
 
-            var books = new EfBookRepository(libraryDbContext);
-            var authors = new EfAuthorRepository(libraryDbContext);
-            var uow = new EfUnitOfWork(libraryDbContext, books, authors);
+            var bookCommandRepository = new EfBookCommandRepository(libraryDbContext);
+            var authorCommandRepository = new EfAuthorCommandRepository(libraryDbContext);
+            var bookQueryRepository = new EfBookQueryRepository(libraryDbContext);
+            var authorQueryRepository = new EfAuthorQueryRepository(libraryDbContext);
+
+
+            var uow = new EfUnitOfWork(libraryDbContext, bookCommandRepository, authorCommandRepository);
             
-            var listBooksUseCase = new ListBooksUseCase(uow);
-            var listAuthorsUseCase = new ListAuthorsUseCase(uow);
+            var listBooksUseCase = new ListBooksUseCase(bookQueryRepository, authorQueryRepository);
+            var listAuthorsUseCase = new ListAuthorsUseCase(bookQueryRepository, authorQueryRepository);
             var addAuthorUseCase = new AddAuthorUseCase(uow);
             var addBookUseCase = new AddBookUseCase(uow);
             var removeAuthorUseCase = new RemoveAuthorUseCase(uow);

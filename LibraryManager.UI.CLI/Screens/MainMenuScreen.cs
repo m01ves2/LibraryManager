@@ -1,6 +1,4 @@
-﻿using LibraryManager.Application.UseCases;
-using LibraryManager.Domain.Interfaces;
-using LibraryManager.UI.CLI.Contexts;
+﻿using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
 {

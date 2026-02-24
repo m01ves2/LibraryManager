@@ -1,4 +1,9 @@
-﻿using LibraryManager.Application.UseCases;
+﻿using LibraryManager.Application.Commands.AddAuthor;
+using LibraryManager.Application.Commands.AddBook;
+using LibraryManager.Application.Commands.RemoveAuthor;
+using LibraryManager.Application.Commands.RemoveBook;
+using LibraryManager.Application.Queries.ListAuthors;
+using LibraryManager.Application.Queries.ListBooks;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens

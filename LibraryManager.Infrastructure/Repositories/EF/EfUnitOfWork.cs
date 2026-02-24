@@ -1,5 +1,4 @@
-﻿using LibraryManager.Domain.Interfaces;
-using LibraryManager.Infrastructure.Repositories.EF.Repositories;
+﻿using LibraryManager.Application.Commands.Interfaces;
 
 namespace LibraryManager.Infrastructure.Repositories.EF
 {
@@ -7,10 +6,10 @@ namespace LibraryManager.Infrastructure.Repositories.EF
     {
         private readonly LibraryDbContext _context;
 
-        public IBookRepository Books { get; }
-        public IAuthorRepository Authors { get; }
+        public IBookCommandRepository Books { get; }
+        public IAuthorCommandRepository Authors { get; }
 
-        public EfUnitOfWork(LibraryDbContext context, IBookRepository books, IAuthorRepository authors)
+        public EfUnitOfWork(LibraryDbContext context, IBookCommandRepository books, IAuthorCommandRepository authors)
         {
             _context = context;
 

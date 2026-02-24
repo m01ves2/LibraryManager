@@ -1,6 +1,6 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Commands.RemoveBook;
+using LibraryManager.Application.Queries.ListBooks;
 using LibraryManager.Application.Results;
-using LibraryManager.Application.UseCases;
 using LibraryManager.UI.CLI.Contexts;
 
 namespace LibraryManager.UI.CLI.Screens
