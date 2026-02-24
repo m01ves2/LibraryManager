@@ -1,7 +1,7 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Interfaces;
+using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 
 namespace LibraryManager.Application.UseCases
 {
@@ -23,7 +23,7 @@ namespace LibraryManager.Application.UseCases
                     return OperationResult<bool>.NotFound($"Author not found");
                 }
 
-                if (_uow.Books.HasBooksByAuthorId(removeAuthorRequest.Id)) {
+                if (_uow.Books.Any(b => b.Author.Id == removeAuthorRequest.Id)) {
                     return OperationResult<bool>.Conflict($"There are author's books. Remove books first");
                 }
 

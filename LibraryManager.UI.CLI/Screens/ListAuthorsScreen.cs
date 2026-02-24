@@ -48,7 +48,7 @@ namespace LibraryManager.UI.CLI.Screens
             if (_currentStep == ListAuthorsStep.Done)
                 return;
             else if (_currentStep == ListAuthorsStep.Confirm) {
-                var request = new ListAuthorsRequest(_context.PageNumber, _context.PageSize);
+                var request = new ListAuthorsRequest(_context.PageNumber, _context.PageSize, _context.Name);
                 var result = _useCase.Execute(request);
                 _data = result.Data;
                 _error = result.Message;

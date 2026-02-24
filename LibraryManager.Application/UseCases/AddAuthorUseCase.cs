@@ -1,7 +1,7 @@
-﻿using LibraryManager.Application.Requests;
+﻿using LibraryManager.Application.Interfaces;
+using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 
 namespace LibraryManager.Application.UseCases
 {

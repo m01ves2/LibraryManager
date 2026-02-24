@@ -1,6 +1,6 @@
-﻿using LibraryManager.Application.UseCases;
+﻿using LibraryManager.Application.Interfaces;
+using LibraryManager.Application.UseCases;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.Infrastructure.Repositories.EF;
 using LibraryManager.Infrastructure.Repositories.EF.Repositories;
 using LibraryManager.UI.CLI.Screens;
@@ -22,9 +22,9 @@ namespace LibraryManager.UI.CLI
             libraryDbContext.Database.EnsureCreated();
 
 
-            var books = new EfBookRepository(libraryDbContext);
-            var authors = new EfAuthorRepository(libraryDbContext);
-            var uow = new EfUnitOfWork(libraryDbContext, books, authors);
+            var books = new EfRepository<Book>(libraryDbContext);
+            var authors = new EfRepository<Author>(libraryDbContext);
+            var uow = new EfUnitOfWork(libraryDbContext);
             
             var listBooksUseCase = new ListBooksUseCase(uow);
             var listAuthorsUseCase = new ListAuthorsUseCase(uow);

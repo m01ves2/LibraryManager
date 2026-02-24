@@ -1,8 +1,7 @@
-﻿using LibraryManager.Application.Models;
+﻿using LibraryManager.Application.Interfaces;
 using LibraryManager.Application.Requests;
 using LibraryManager.Application.Results;
 using LibraryManager.Domain.Entities;
-using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.ValueObjects;
 
 namespace LibraryManager.Application.UseCases
@@ -26,7 +25,9 @@ namespace LibraryManager.Application.UseCases
                 Isbn? isbn = null;
                 if (addBookRequest.Isbn is not null) {
                     isbn = Isbn.Parse(addBookRequest.Isbn);
-                    Book? bookByIsbn = _uow.Books.GetByIsbn(isbn);
+
+                    Book? bookByIsbn = _uow.Books.Find(b => b.Isbn.Value == isbn.Value, 0, int.MaxValue).FirstOrDefault();
+
                     if (bookByIsbn is not null)
                         return OperationResult<AddBookResult>.Conflict($"Book ISBN:{addBookRequest.Isbn} already exists");
                 }
@@ -42,23 +43,6 @@ namespace LibraryManager.Application.UseCases
                 // Любые неожиданные исключения централизованно обрабатываем
                 return OperationResult<AddBookResult>.Error(ex.Message);
             }
-        }
-
-        public OperationResult<IReadOnlyList<AuthorPreview>> GetAuthors(string authorName)
-        {
-            if (string.IsNullOrWhiteSpace(authorName))
-                return OperationResult<IReadOnlyList<AuthorPreview>>.InvalidInput("Author name is empty");
-
-            var authors = _uow.Authors.GetByName(authorName).ToList();
-            if (!authors.Any())
-                return OperationResult<IReadOnlyList<AuthorPreview>>.NotFound($"Author not found");
-
-
-            var authorsBooks = authors.ToDictionary(author => author.Id, author => _uow.Books.GetPagedByAuthorId(0, 3, author.Id).Select(b => b.Title).ToList());
-            var authorsBooksCount = authors.ToDictionary(author => author.Id, author => _uow.Books.CountByAuthorId(author.Id));
-            
-            var result = authors.Select(author => new AuthorPreview(author.Id, author.Name, authorsBooksCount[author.Id], authorsBooks[author.Id])).ToList();
-            return OperationResult<IReadOnlyList<AuthorPreview>>.Ok(result);
         }
     }
 }
