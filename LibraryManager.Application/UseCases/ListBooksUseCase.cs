@@ -20,7 +20,7 @@ namespace LibraryManager.Application.UseCases
             try {
                 int skip = (listBooksRequest.PageNumber - 1) * listBooksRequest.PageSize;
                 int take = listBooksRequest.PageSize;
-                List<Book> books = _uow.Books.GetPaged(skip, take).ToList();
+                List<Book> books = _uow.Books.GetPaged(skip, take, listBooksRequest.TitleContains, listBooksRequest.AuthorNameContains, listBooksRequest.IsbnContains).ToList();
                 int totalCount = _uow.Books.Count();
 
                 // Маппинг Entity -> DTO

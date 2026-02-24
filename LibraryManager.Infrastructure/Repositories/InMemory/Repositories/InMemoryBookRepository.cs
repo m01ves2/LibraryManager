@@ -1,6 +1,7 @@
 ﻿using LibraryManager.Domain.Entities;
 using LibraryManager.Domain.Interfaces;
 using LibraryManager.Domain.ValueObjects;
+using System.Linq.Expressions;
 
 namespace LibraryManager.Infrastructure.Repositories.InMemory.Repositories
 {
@@ -46,9 +47,14 @@ namespace LibraryManager.Infrastructure.Repositories.InMemory.Repositories
             return _books.Where(b => b.Author.Id == authorId).ToList();
         }
 
-        public IReadOnlyList<Book> GetPaged(int skip, int take)
+        public IReadOnlyList<Book> GetPaged(int skip, int take, string? titleContains = null, string? authorNameContains = null, string? isbnContains = null)
         {
-            return _books.Skip(skip).Take(take).ToList();
+            Func<Book, bool> predicate = b =>
+                (string.IsNullOrWhiteSpace(authorNameContains) || b.Author.Name.Contains(authorNameContains)) &&
+                (string.IsNullOrWhiteSpace(titleContains) || b.Title.Contains(titleContains)) &&
+                (string.IsNullOrWhiteSpace(isbnContains) || (b.Isbn != null && b.Isbn.Value.Contains(isbnContains)));
+
+            return _books.Where(predicate).Skip(skip).Take(take).ToList();
         }
 
         public IReadOnlyList<Book> GetPagedByAuthorId(int skip, int take, int authorId)

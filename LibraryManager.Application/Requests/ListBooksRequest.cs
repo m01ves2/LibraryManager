@@ -11,7 +11,7 @@
         public string? AuthorNameContains { get; set; }
         public string? IsbnContains { get; set; }
 
-        public ListBooksRequest(int pageNumber, int pageSize)
+        public ListBooksRequest(int pageNumber, int pageSize, string? titleContains = null, string? authorNameContains = null, string? isbnContains = null)
         {
             if (pageNumber < 1)
                 throw new ArgumentOutOfRangeException(nameof(pageNumber), "PageNumber must be >= 1");
@@ -21,6 +21,9 @@
 
             PageNumber = pageNumber;
             PageSize = pageSize;
+            TitleContains = titleContains;
+            AuthorNameContains = authorNameContains;
+            IsbnContains = isbnContains;
         }
     }
 }
