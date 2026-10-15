@@ -94,3 +94,18 @@ This project was designed as a **learning and portfolio project**. It demonstrat
 - Advanced Application layer orchestration
 - Practical usage of EF Core and In-Memory databases
 - Minimal CQRS implementation in a small-scale CLI project
+
+
+## Keyboard Navigation
+
+The CLI supports keyboard navigation in book and author lists:
+
+- **Up / Down** - move between list items.
+- **Left / Right** - switch between pages.
+- **Esc** - return to the main menu.
+
+Text input screens continue to use `Console.ReadLine()`, while list screens override `Screen.ReadInput()` and use `Console.ReadKey()`.
+
+Keyboard events are translated into existing text commands (`W`, `S`, `P`, `N`, `Q`), allowing the original `HandleInput()` logic to remain unchanged.
+
+This demonstrates how polymorphism and a well-defined extension point can introduce new functionality without modifying the existing navigation architecture.
