@@ -20,6 +20,7 @@ namespace LibraryManager.Infrastructure.Repositories.EF.Repositories
             _context.Books.Add(book);
         }
 
+        //REVIEW: ошибка: Count() не учитывает фильтры GetPaged(). Поэтому при фильтрации количество страниц будет рассчитано неверно.
         public int Count()
         {
             return _context.Books.Count();
