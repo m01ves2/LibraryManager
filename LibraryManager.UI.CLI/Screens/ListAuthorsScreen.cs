@@ -104,9 +104,9 @@ namespace LibraryManager.UI.CLI.Screens
                 case ListAuthorsStep.Done:
                     if (_data is not null) {
                         if (_data.HasPreviousPage || _data.HasNextPage) {
-                            Console.WriteLine("[P] - previous page, [N] - next page");
+                            Console.WriteLine("[Left/Right]  - previous/next page");
                         }
-                        Console.WriteLine("[W] - select prev, [S] - select next");
+                        Console.WriteLine("[Up/Down] - previous/next item");
                     }
                     break;
             }
@@ -118,9 +118,25 @@ namespace LibraryManager.UI.CLI.Screens
             Console.WriteLine("[2] - Delete selected");
             Console.WriteLine("[3] - Modify selected");
             Console.WriteLine("[B] - Go back");
-            Console.WriteLine("[Q] - Main menu");
+            Console.WriteLine("[Esc/Q] - Main menu");
 
             Console.Write("\nSelect option: ");
+        }
+
+        //Adapter for key input instead of string input. now we can navigate in tables by arrow keys :D
+        protected override string ReadInput()
+        {
+            var key = Console.ReadKey(intercept: true);
+
+            return key.Key switch
+            {
+                ConsoleKey.UpArrow => "W",
+                ConsoleKey.DownArrow => "S",
+                ConsoleKey.LeftArrow => "P",
+                ConsoleKey.RightArrow => "N",
+                ConsoleKey.Escape => "Q",
+                _ => key.KeyChar.ToString()
+            };
         }
 
         protected override Screen HandleInput(string input)
