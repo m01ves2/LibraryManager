@@ -29,6 +29,20 @@ namespace LibraryManager.Application.UseCases
                 // Маппинг Entity -> DTO
                 var bookSummaries = books.Select(book => new BookPreview(book.Id, book.Title, book.Author.Name, book.Isbn?.Value)).ToList();
 
+                //REVIEW - можно было сделать сразу одним запросом и выборку, и маппинг, без предварительного получения  List<Book> books
+                //var bookSummaries = _context.Books
+                //    .AsNoTracking()
+                //    .OrderBy(b => b.Id)
+                //    .Skip(skip)
+                //    .Take(take)
+                //    .Select(b => new BookPreview(
+                //        b.Id,
+                //        b.Title,
+                //        b.Author.Name,
+                //        b.Isbn != null ? b.Isbn.Value : null
+                //    ))
+                //    .ToList();
+
                 ListBooksResult data = new ListBooksResult(totalCount, listBooksRequest.PageNumber, listBooksRequest.PageSize, bookSummaries);
                 return OperationResult<ListBooksResult>.Ok(data);
             }

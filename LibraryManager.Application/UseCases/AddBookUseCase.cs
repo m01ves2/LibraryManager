@@ -21,6 +21,7 @@ namespace LibraryManager.Application.UseCases
         public OperationResult<AddBookResult> Execute(AddBookRequest addBookRequest)
         {
             try {
+                // REVIEW: Remove unnecessary Include() call.
                 Author? author = _context.Authors.Where(a => a.Id == addBookRequest.AuthorId).Include(a => a.Books).FirstOrDefault();
                 if (author is null)
                     return OperationResult<AddBookResult>.NotFound($"Author not found");
@@ -28,6 +29,9 @@ namespace LibraryManager.Application.UseCases
                 Isbn? isbn = null;
                 if (addBookRequest.Isbn is not null) {
                     isbn = Isbn.Parse(addBookRequest.Isbn);
+
+                    // REVIEW: Remove unnecessary Include() call.
+                    // Use Any() instead of loading an entity when checking ISBN uniqueness.
                     Book? bookByIsbn = _context.Books.Where(b => b.Isbn != null && b.Isbn.Value == isbn.Value).Include(b => b.Author).FirstOrDefault();
                     if (bookByIsbn is not null)
                         return OperationResult<AddBookResult>.Conflict($"Book ISBN:{addBookRequest.Isbn} already exists");
